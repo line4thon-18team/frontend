@@ -4,7 +4,8 @@
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", system-ui, sans-serif;
+  background: #eef0f4;
 }
 
 button, input, textarea, select {
