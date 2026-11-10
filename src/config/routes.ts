@@ -1,4 +1,8 @@
 export const routes = {
+  login: "/login",
+  onboardingProfile: "/onboarding/profile",
+  onboardingPreferences: "/onboarding/preferences",
+  onboardingComplete: "/onboarding/complete",
   home: "/",
   notifications: "/notifications",
   myTrips: "/my-trips",

@@ -11,6 +11,30 @@ const router = createBrowserRouter([
     hydrateFallbackElement: <></>,
     children: [
       {
+        path: routes.login,
+        lazy: async () => ({
+          Component: (await import("../pages/OnboardingPage")).default,
+        }),
+      },
+      {
+        path: routes.onboardingProfile,
+        lazy: async () => ({
+          Component: (await import("../pages/OnboardingPage")).default,
+        }),
+      },
+      {
+        path: routes.onboardingPreferences,
+        lazy: async () => ({
+          Component: (await import("../pages/OnboardingPage")).default,
+        }),
+      },
+      {
+        path: routes.onboardingComplete,
+        lazy: async () => ({
+          Component: (await import("../pages/OnboardingPage")).default,
+        }),
+      },
+      {
         element: <Layout />,
         children: [{ index: true, element: <HomePage /> }],
       },

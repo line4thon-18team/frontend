@@ -39,6 +39,13 @@ test("홈의 주요 탭과 알림 경로가 앱 안에 등록된다", () => {
   assert.equal(routes.savedItems, "/my/saved");
 });
 
+test("로그인과 온보딩 단계가 순서대로 등록된다", () => {
+  assert.equal(routes.login, "/login");
+  assert.equal(routes.onboardingProfile, "/onboarding/profile");
+  assert.equal(routes.onboardingPreferences, "/onboarding/preferences");
+  assert.equal(routes.onboardingComplete, "/onboarding/complete");
+});
+
 test("직접 일정 만들기 모드는 AI 여행 만들기와 분리된다", () => {
   assert.equal(isDirectTripMode("?mode=direct"), true);
   assert.equal(isDirectTripMode("?mode=manual"), true);
