@@ -12,6 +12,7 @@ import {
   travelerCoursePath,
 } from "../src/utils/navigation.ts";
 import { routes } from "../src/config/routes.ts";
+import { policyPath } from "../src/data/policyDocuments.ts";
 
 test("일정 결과 경로에 진입 출처와 코스가 유지된다", () => {
   assert.equal(
@@ -49,6 +50,9 @@ test("로그인과 온보딩 단계가 순서대로 등록된다", () => {
   assert.equal(routes.onboardingPreferences, "/onboarding/preferences");
   assert.equal(routes.onboardingComplete, "/onboarding/complete");
   assert.equal(routes.invite, "/invite/:inviteId");
+  assert.equal(routes.policyDetail, "/my/account/policies/:policyId");
+  assert.equal(policyPath("service"), "/my/account/policies/service");
+  assert.equal(policyPath("privacy", true), "/my/account/policies/privacy?from=login");
 });
 
 test("직접 일정 만들기 모드는 AI 여행 만들기와 분리된다", () => {

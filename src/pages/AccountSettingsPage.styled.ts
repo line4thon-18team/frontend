@@ -98,6 +98,7 @@ export const PolicyButton = styled.button`
   font-size: 15px !important;
   line-height: 22px !important;
   font-weight: 500 !important;
+  text-decoration: none;
 
   img { width: 16px; height: 16px; }
 `;

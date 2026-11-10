@@ -6,6 +6,7 @@ import blueAvatar from "../assets/images/character-blue.webp";
 import purpleAvatar from "../assets/images/character-purple.webp";
 import googleMapsLogo from "../assets/images/brand-google-maps.webp";
 import { routes } from "../config/routes";
+import { policyPath, type PolicyDocumentId } from "../data/policyDocuments";
 import {
   readGoogleMapsSettings,
   readProfileSettings,
@@ -13,7 +14,11 @@ import {
 } from "../utils/mySettings";
 import * as S from "./AccountSettingsPage.styled";
 
-const policies = ["서비스 이용약관", "개인정보 처리방침", "위치기반 서비스 이용약관"];
+const policies: Array<{ id: PolicyDocumentId; label: string }> = [
+  { id: "service", label: "서비스 이용약관" },
+  { id: "privacy", label: "개인정보 처리방침" },
+  { id: "location", label: "위치기반 서비스 이용약관" },
+];
 
 function AccountSettingsPage() {
   const navigate = useNavigate();
@@ -73,11 +78,11 @@ function AccountSettingsPage() {
         <h2>약관과 개인정보</h2>
         {policies.map((policy) => (
           <S.PolicyButton
-            type="button"
-            key={policy}
-            onClick={() => setNotice(`${policy} 화면은 준비 중이에요`)}
+            as={Link}
+            to={policyPath(policy.id)}
+            key={policy.id}
           >
-            {policy}<img src={chevronIcon} alt="" />
+            {policy.label}<img src={chevronIcon} alt="" />
           </S.PolicyButton>
         ))}
         <S.AccountActions>

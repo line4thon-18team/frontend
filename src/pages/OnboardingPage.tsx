@@ -13,6 +13,7 @@ import profileRing from "../assets/onboarding/profile-ring.svg";
 import validCheckIcon from "../assets/onboarding/valid-check.svg";
 import welcomeCharacter from "../assets/onboarding/welcome-character.png";
 import { routes } from "../config/routes";
+import { policyPath, type PolicyDocumentId } from "../data/policyDocuments";
 import * as S from "./OnboardingPage.styled";
 
 type AgreementKey = "service" | "privacy" | "age" | "location" | "marketing";
@@ -24,6 +25,13 @@ const agreements: Array<{ key: AgreementKey; required: boolean; label: string; d
   { key: "location", required: false, label: "위치 정보 이용", details: true },
   { key: "marketing", required: false, label: "혜택과 이벤트 알림 받기", details: true },
 ];
+
+const agreementPolicy: Partial<Record<AgreementKey, PolicyDocumentId>> = {
+  service: "service",
+  privacy: "privacy",
+  location: "location",
+  marketing: "marketing",
+};
 
 const preferenceOptions = [
   "맛집 탐방",
@@ -240,7 +248,9 @@ function OnboardingPage() {
                     <span data-optional={!agreement.required}>[{agreement.required ? "필수" : "선택"}]</span>
                     <b>{agreement.label}</b>
                   </button>
-                  {agreement.details && <button type="button">보기</button>}
+                  {agreement.details && agreementPolicy[agreement.key] && (
+                    <button type="button" onClick={() => navigate(policyPath(agreementPolicy[agreement.key]!, true))}>보기</button>
+                  )}
                 </li>
               ))}
             </S.TermList>
