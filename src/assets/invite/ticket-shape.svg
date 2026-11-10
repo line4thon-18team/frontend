@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="426" height="468.5" viewBox="0 0 426 468.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ticket shape" filter="url(#filter0_d_0_37)">
+<path d="M370 20C383.255 20 394 30.7452 394 44V257C387.373 257 382 262.373 382 269C382 275.627 387.373 281 394 281V400.5C394 413.755 383.255 424.5 370 424.5H56C42.7452 424.5 32 413.755 32 400.5V281C38.6274 281 44 275.627 44 269C44 262.373 38.6274 257 32 257V44C32 30.7452 42.7452 20 56 20H370Z" fill="white"/>
+</g>
+<defs>
+<filter id="filter0_d_0_37" x="0" y="0" width="426" height="468.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="12"/>
+<feGaussianBlur stdDeviation="16"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.035 0 0 0 0 0.027 0 0 0 0 0.22 0 0 0 0.12 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_37"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_37" result="shape"/>
+</filter>
+</defs>
+</svg>
