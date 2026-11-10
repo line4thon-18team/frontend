@@ -115,6 +115,24 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: routes.notices,
+        lazy: async () => ({
+          Component: (await import("../pages/SupportPage")).default,
+        }),
+      },
+      {
+        path: routes.faq,
+        lazy: async () => ({
+          Component: (await import("../pages/SupportPage")).default,
+        }),
+      },
+      {
+        path: routes.feedback,
+        lazy: async () => ({
+          Component: (await import("../pages/SupportPage")).default,
+        }),
+      },
+      {
         element: <Layout variant="courses" />,
         children: [
           {

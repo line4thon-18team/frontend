@@ -103,21 +103,21 @@ function MyPage() {
       <S.Band />
       <S.MenuSection>
         <h2>고객 지원</h2>
-        <S.MenuButton type="button">
+        <S.MenuLink to={routes.notices}>
           <img src={noticeIcon} alt="" />
           <span>공지사항</span>
           <S.MenuChevron src={chevronIcon} alt="" />
-        </S.MenuButton>
-        <S.MenuButton type="button">
+        </S.MenuLink>
+        <S.MenuLink to={routes.faq}>
           <img src={faqIcon} alt="" />
           <span>자주 묻는 질문</span>
           <S.MenuChevron src={chevronIcon} alt="" />
-        </S.MenuButton>
-        <S.MenuButton type="button">
+        </S.MenuLink>
+        <S.MenuLink to={routes.feedback}>
           <img src={feedbackIcon} alt="" />
           <span>도틀로에 의견 보내기</span>
           <S.MenuChevron src={chevronIcon} alt="" />
-        </S.MenuButton>
+        </S.MenuLink>
       </S.MenuSection>
 
       {showSavedToast && <S.Toast role="status">✓ 프로필을 저장했어요</S.Toast>}
