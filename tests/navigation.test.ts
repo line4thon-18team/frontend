@@ -44,6 +44,7 @@ test("로그인과 온보딩 단계가 순서대로 등록된다", () => {
   assert.equal(routes.onboardingProfile, "/onboarding/profile");
   assert.equal(routes.onboardingPreferences, "/onboarding/preferences");
   assert.equal(routes.onboardingComplete, "/onboarding/complete");
+  assert.equal(routes.invite, "/invite/:inviteId");
 });
 
 test("직접 일정 만들기 모드는 AI 여행 만들기와 분리된다", () => {

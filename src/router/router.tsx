@@ -35,6 +35,12 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: routes.invite,
+        lazy: async () => ({
+          Component: (await import("../pages/InvitePage")).default,
+        }),
+      },
+      {
         element: <Layout />,
         children: [{ index: true, element: <HomePage /> }],
       },

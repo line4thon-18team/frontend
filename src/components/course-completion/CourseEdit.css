@@ -132,6 +132,16 @@
   font-weight: 700;
 }
 
+.course-toast > img {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.course-toast--invite p {
+  margin-right: 0;
+}
+
 .course-toast p {
   flex: 1;
   margin: 0 10px;

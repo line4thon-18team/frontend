@@ -3,6 +3,7 @@ export const routes = {
   onboardingProfile: "/onboarding/profile",
   onboardingPreferences: "/onboarding/preferences",
   onboardingComplete: "/onboarding/complete",
+  invite: "/invite/:inviteId",
   home: "/",
   notifications: "/notifications",
   myTrips: "/my-trips",
