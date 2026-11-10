@@ -5,6 +5,10 @@ import locationIcon from "../assets/course-settings/pin.svg";
 import courseIcon from "../assets/icons/my-route.svg";
 import profileIcon from "../assets/icons/nav-profile.svg";
 import airplaneIcon from "../assets/icons/transport-airplane.svg";
+import chevronIcon from "../assets/icons/nav-chevron-right-muted.svg";
+import noticeIcon from "../assets/figma/my-flag.svg";
+import faqIcon from "../assets/figma/my-search.svg";
+import feedbackIcon from "../assets/figma/my-pen.svg";
 import blueAvatar from "../assets/images/character-blue.webp";
 import purpleAvatar from "../assets/images/character-purple.webp";
 import googleMapsLogo from "../assets/images/brand-google-maps.webp";
@@ -86,13 +90,13 @@ function MyPage() {
           <img src={bellIcon} alt="" />
           <span>알림 설정</span>
           <small>{notificationCount}개 켜짐</small>
-          <b>›</b>
+          <S.MenuChevron src={chevronIcon} alt="" />
         </S.MenuLink>
         <S.MenuLink to={routes.accountSettings}>
           <img src={profileIcon} alt="" />
           <span>계정 관리</span>
           <small>카카오</small>
-          <b>›</b>
+          <S.MenuChevron src={chevronIcon} alt="" />
         </S.MenuLink>
       </S.MenuSection>
 
@@ -100,19 +104,19 @@ function MyPage() {
       <S.MenuSection>
         <h2>고객 지원</h2>
         <S.MenuButton type="button">
-          <S.TextIcon aria-hidden="true">⚐</S.TextIcon>
+          <img src={noticeIcon} alt="" />
           <span>공지사항</span>
-          <b>›</b>
+          <S.MenuChevron src={chevronIcon} alt="" />
         </S.MenuButton>
         <S.MenuButton type="button">
-          <S.TextIcon aria-hidden="true">⌕</S.TextIcon>
+          <img src={faqIcon} alt="" />
           <span>자주 묻는 질문</span>
-          <b>›</b>
+          <S.MenuChevron src={chevronIcon} alt="" />
         </S.MenuButton>
         <S.MenuButton type="button">
-          <S.TextIcon aria-hidden="true">✎</S.TextIcon>
+          <img src={feedbackIcon} alt="" />
           <span>도틀로에 의견 보내기</span>
-          <b>›</b>
+          <S.MenuChevron src={chevronIcon} alt="" />
         </S.MenuButton>
       </S.MenuSection>
 

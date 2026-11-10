@@ -81,12 +81,10 @@ export const BackButton = styled.button`
   height: 36px;
   border-radius: 50%;
 
-  span {
-    margin-top: -3px;
-    font-family: Arial, sans-serif;
-    font-size: 37px;
-    line-height: 1;
-    font-weight: 300;
+  > img {
+    display: block;
+    width: 8.11667px;
+    height: 14.5333px;
   }
 
   &:hover {
@@ -187,6 +185,12 @@ export const OptionalGrid = styled.div`
     color: ${navy};
     background: #ebeaff;
     font-size: 17px;
+
+    img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
   }
 
   strong {
@@ -619,6 +623,11 @@ export const TimelineCard = styled.article`
     color: #a5a5af;
     font-size: 21px;
     text-align: center;
+
+    img {
+      width: 14px;
+      height: 14px;
+    }
   }
 `;
 
@@ -684,6 +693,12 @@ export const SearchHeader = styled.header`
     background: #b8b9c1;
     font-size: 15px;
     text-align: center;
+
+    img {
+      width: 12px;
+      height: 12px;
+      filter: brightness(0) invert(1);
+    }
   }
 `;
 

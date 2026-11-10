@@ -29,6 +29,7 @@ import camera from "../../assets/icons/category-sightseeing.svg";
 import shopping from "../../assets/icons/category-shopping.svg";
 import searchIcon from "../../assets/icons/search-default.svg";
 import loadingDots from "../../assets/icons/status-loading-dots.svg";
+import chevronIcon from "../../assets/icons/nav-chevron-right.svg";
 import * as S from "./Trip.styled";
 import * as P from "./SavedPlacesStep.styled";
 interface SavedPlacesStepProps {
@@ -359,7 +360,14 @@ function SavedPlacesStep({
                         <img key={place.id} src={place.image} alt="" />
                       ))}
                     </P.CoursePhotos>
-                    <p>{photos.map((place) => place.title).join(" › ")}</p>
+                    <P.CoursePath>
+                      {photos.map((place, index) => (
+                        <span key={place.id}>
+                          {index > 0 && <img src={chevronIcon} alt="" />}
+                          {place.title}
+                        </span>
+                      ))}
+                    </P.CoursePath>
                     <S.Help>
                       코스를 열어 원하는 장소만 골라 담을 수 있어요
                     </S.Help>
@@ -371,7 +379,7 @@ function SavedPlacesStep({
                         setLargeMap(false);
                       }}
                     >
-                      코스 자세히 보기 ›
+                      코스 자세히 보기 <img src={chevronIcon} alt="" />
                     </button>
                   </P.CourseCard>
                 );
@@ -387,7 +395,7 @@ function SavedPlacesStep({
                   type="button"
                   onClick={() => setShowAllRecommended(true)}
                 >
-                  전체 보기 ›
+                  전체 보기 <img src={chevronIcon} alt="" />
                 </button>
               </P.RecommendHeading>
               <P.PlaceList>

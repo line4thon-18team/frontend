@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="icon/pen" clip-path="url(#clip0_0_82)">
+<path id="Rectangle 151155136" d="M2.89684 18.6496L12.3755 17.2955C12.6732 17.253 12.9312 17.067 13.0657 16.798L15.3995 12.1305C15.5759 11.7776 15.5068 11.3514 15.2278 11.0724L10.4741 6.31868C10.1951 6.03969 9.76886 5.97052 9.41595 6.14697L4.74844 8.48073C4.47939 8.61525 4.29347 8.87321 4.25093 9.17098L2.89684 18.6496ZM2.89684 18.6496L7.33342 14.213" stroke-width="1.83333" stroke-linejoin="round" stroke="#1A1A1A"/>
+<rect id="Rectangle 151155137" x="12.1396" y="2.29722" width="10.0551" height="4.02205" rx="0.916667" transform="rotate(45 12.1396 2.29722)" stroke="#1A1A1A" stroke-width="1.83333" stroke-linecap="round" stroke-linejoin="round"/>
+<circle id="Ellipse 76" cx="8.34135" cy="13.2242" r="1.95394" fill="#1A1A1A" stroke-width="1.375" stroke="#1A1A1A"/>
+</g>
+<defs>
+<clipPath id="clip0_0_82">
+<rect width="22" height="22" fill="white"/>
+</clipPath>
+</defs>
+</svg>

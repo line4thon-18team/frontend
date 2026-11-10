@@ -631,13 +631,9 @@
   font-weight: 500;
 }
 
-.companion-opinions__header > button span {
-  font-size: 20px;
-  line-height: 14px;
-}
-
-.companion-opinions__header > button.is-liked span {
-  color: #0079c2;
+.companion-opinions__header > button img {
+  width: 16px;
+  height: 16px;
 }
 
 .companion-opinions__thread {
@@ -736,6 +732,42 @@
 
 .companion-comment__actions button:first-child.is-liked {
   color: #0079c2;
+}
+
+.companion-comment__actions button:first-child img {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+}
+
+.companion-composer label > button > span {
+  position: relative;
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.companion-composer label > button > span::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.companion-composer label > button > span::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  width: 2px;
+  height: 12px;
+  border-radius: 2px;
+  background: currentColor;
 }
 
 .companion-composer {

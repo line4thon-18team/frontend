@@ -3,6 +3,9 @@ import placeDetailActions from "../../assets/course-completion/place-detail-acti
 import placeDetailBack from "../../assets/course-completion/place-detail-back.svg";
 import placeDetailMap from "../../assets/course-completion/place-detail-map.png";
 import placeDetailPhoto from "../../assets/course-completion/place-detail-photo.png";
+import mapIcon from "../../assets/figma/traveler-pin.svg";
+import infoIcon from "../../assets/course-completion/unplaced-info.svg";
+import chevronIcon from "../../assets/icons/nav-chevron-down.svg";
 import CompanionOpinions from "../course-community/CompanionOpinions";
 import type { CoursePlace } from "../../types/courseCompletion";
 
@@ -25,7 +28,7 @@ function PlaceDetail({ place, onBack, onRemove }: PlaceDetailProps) {
             <img src={placeDetailBack} alt="" />
           </button>
           <span />
-          <button type="button" aria-label="지도에서 보기">⌖</button>
+          <button type="button" aria-label="지도에서 보기"><img src={mapIcon} alt="" /></button>
           <button type="button" aria-label="더 보기">
             <img src={placeDetailActions} alt="" />
           </button>
@@ -52,9 +55,9 @@ function PlaceDetail({ place, onBack, onRemove }: PlaceDetailProps) {
           aria-expanded={detailsExpanded}
           onClick={() => setDetailsExpanded((current) => !current)}
         >
-          <span aria-hidden="true">ⓘ</span>
+          <img src={infoIcon} alt="" />
           영업시간, 위치 등 장소 정보 보기
-          <b aria-hidden="true">{detailsExpanded ? "⌃" : "›"}</b>
+          <img className={detailsExpanded ? "is-expanded" : ""} src={chevronIcon} alt="" />
         </button>
 
         <CompanionOpinions />

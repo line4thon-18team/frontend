@@ -120,13 +120,9 @@ export const MenuButton = styled.button`
   }
 `;
 
-export const Chevron = styled.span`
-  color: #aeaeb2;
-  font-family: Arial, sans-serif;
-  font-size: 29px;
-  font-weight: 300;
-  line-height: 20px;
-  text-align: center;
+export const Chevron = styled.img`
+  width: 16px !important;
+  height: 16px !important;
 `;
 
 export const Divider = styled.hr`
@@ -138,18 +134,30 @@ export const Divider = styled.hr`
 `;
 
 export const ActionBadge = styled.span<{ $tone: "cyan" | "pink" }>`
+  position: relative;
   width: 24px;
   height: 24px;
-  display: grid;
-  place-items: center;
   justify-self: center;
   border-radius: 50%;
   background: ${({ $tone }) => ($tone === "cyan" ? "#00e1ff" : "#ff7891")};
-  color: #ffffff;
-  font-family: Arial, sans-serif;
-  font-size: 21px;
-  font-weight: 700;
-  line-height: 1;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 11px;
+    height: 2px;
+    border-radius: 2px;
+    background: #ffffff;
+    transform: translate(-50%, -50%);
+  }
+
+  &::after {
+    display: ${({ $tone }) => ($tone === "cyan" ? "block" : "none")};
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
 `;
 
 export const LeaveIcon = styled.span`

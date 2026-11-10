@@ -1,4 +1,5 @@
 import { travelerCourse } from "../../data/mocks/travelerCourseData";
+import backIcon from "../../assets/figma/map-back.svg";
 import * as S from "./TravelerCourseOverlay.styled";
 
 interface TravelerCourseMapProps {
@@ -21,7 +22,7 @@ function TravelerCourseMap({ activeDay, onBack, onDayChange, onOpenPlace }: Trav
   return (
     <S.MapScreen>
       <S.MapHeader>
-        <div><button type="button" aria-label="코스 상세로 돌아가기" onClick={onBack}>‹</button><h1>교토 2박 3일</h1><span /></div>
+        <div><button type="button" aria-label="코스 상세로 돌아가기" onClick={onBack}><img src={backIcon} alt="" /></button><h1>교토 2박 3일</h1><span /></div>
         <S.MapTabs aria-label="지도 일차 선택">
           <button type="button" aria-pressed={false} onClick={() => onDayChange(0)}>전체</button>
           {travelerCourse.days.map((item, index) => (

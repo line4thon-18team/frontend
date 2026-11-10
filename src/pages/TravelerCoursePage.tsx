@@ -1,5 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import backIcon from "../assets/figma/traveler-back.svg";
+import calendarIcon from "../assets/figma/traveler-calendar.svg";
+import heartIcon from "../assets/figma/traveler-heart.svg";
+import heartFilledIcon from "../assets/figma/traveler-heart-filled.svg";
+import pinIcon from "../assets/figma/traveler-pin.svg";
+import trainIcon from "../assets/figma/traveler-train.svg";
+import walkIcon from "../assets/figma/traveler-walk.svg";
 import { routes } from "../config/routes";
 import { travelerCourse } from "../data/mocks/travelerCourseData";
 import TravelerCourseMap from "../components/traveler-course/TravelerCourseMap";
@@ -69,11 +76,11 @@ function TravelerCoursePage() {
         <img src={travelerCourse.hero} alt="교토의 전통 골목" />
         <S.Navigation aria-label="여행자 코스 탐색">
           <button type="button" aria-label="코스 목록으로 돌아가기" onClick={() => navigate(routes.courses)}>
-            ‹
+            <img src={backIcon} alt="" />
           </button>
           <strong>여행자 코스</strong>
           <S.Heart type="button" $saved={isSaved} aria-label={isSaved ? "코스 찜 해제" : "코스 찜하기"} onClick={toggleSaved}>
-            {isSaved ? "♥" : "♡"}
+            <img src={isSaved ? heartFilledIcon : heartIcon} alt="" />
           </S.Heart>
         </S.Navigation>
       </S.Hero>
@@ -97,9 +104,9 @@ function TravelerCoursePage() {
         </S.Intro>
 
         <S.Facts aria-label="코스 요약">
-          <div><b>▣</b><strong>{travelerCourse.duration}</strong><span>여행 기간</span></div>
-          <div><b>⌖</b><strong>{travelerCourse.placeCount}곳</strong><span>방문 장소</span></div>
-          <div><b>▤</b><strong>{travelerCourse.transport}</strong><span>이동 방법</span></div>
+          <div><img src={calendarIcon} alt="" /><strong>{travelerCourse.duration}</strong><span>여행 기간</span></div>
+          <div><img src={pinIcon} alt="" /><strong>{travelerCourse.placeCount}곳</strong><span>방문 장소</span></div>
+          <div><img src={trainIcon} alt="" /><strong>{travelerCourse.transport}</strong><span>이동 방법</span></div>
         </S.Facts>
 
         <S.Days>
@@ -124,7 +131,7 @@ function TravelerCoursePage() {
                     <img src={place.image} alt="" />
                     <span><strong>{place.name}</strong><small>{place.category}</small></span>
                   </S.PlaceCard>
-                  {place.travelTime && <S.Move>♙　{place.travelTime}<span>{place.distance}</span></S.Move>}
+                  {place.travelTime && <S.Move><img src={walkIcon} alt="" />{place.travelTime}<span>{place.distance}</span></S.Move>}
                 </S.PlaceContent>
               </S.PlaceRow>
             ))}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import backIcon from "../assets/icons/nav-back.svg";
+import chevronIcon from "../assets/icons/nav-chevron-right-muted.svg";
 import blueAvatar from "../assets/images/character-blue.webp";
 import purpleAvatar from "../assets/images/character-purple.webp";
 import googleMapsLogo from "../assets/images/brand-google-maps.webp";
@@ -76,7 +77,7 @@ function AccountSettingsPage() {
             key={policy}
             onClick={() => setNotice(`${policy} 화면은 준비 중이에요`)}
           >
-            {policy}<span>›</span>
+            {policy}<img src={chevronIcon} alt="" />
           </S.PolicyButton>
         ))}
         <S.AccountActions>

@@ -876,15 +876,20 @@
   text-align: left;
 }
 
-.place-detail__more-info > span {
-  color: #090738;
-  font-weight: 700;
+.place-detail__more-info > img {
+  width: 17px;
+  height: 17px;
 }
 
-.place-detail__more-info > b {
-  color: #8a8a8e;
-  font-size: 20px;
-  text-align: right;
+.place-detail__more-info > img:last-child {
+  width: 14px;
+  height: 14px;
+  justify-self: end;
+  transition: transform 0.2s ease;
+}
+
+.place-detail__more-info > img:last-child.is-expanded {
+  transform: rotate(180deg);
 }
 
 .place-detail section {

@@ -99,7 +99,7 @@ export const PolicyButton = styled.button`
   line-height: 22px !important;
   font-weight: 500 !important;
 
-  span { color: #d1d1d6; font-size: 24px; }
+  img { width: 16px; height: 16px; }
 `;
 
 export const AccountActions = styled.div`

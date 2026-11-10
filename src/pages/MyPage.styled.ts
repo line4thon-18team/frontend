@@ -230,12 +230,6 @@ const menuRow = css`
     line-height: 18px;
   }
 
-  > b {
-    color: #b4b5bd;
-    font-size: 23px;
-    line-height: 20px;
-    font-weight: 400;
-  }
 `;
 
 export const MenuButton = styled.button`
@@ -247,12 +241,10 @@ export const MenuLink = styled(Link)`
   text-decoration: none;
 `;
 
-export const TextIcon = styled.span`
-  display: grid;
-  place-items: center;
-  color: #1a1a1a;
-  font-size: 20px;
-  line-height: 1;
+export const MenuChevron = styled.img`
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 auto;
 `;
 
 export const Toast = styled.div`

@@ -35,12 +35,19 @@ export const MapHeader = styled.header`
   }
 
   button {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
     border: 0;
     padding: 0;
     background: none;
-    font-size: 32px;
-    line-height: 28px;
     cursor: pointer;
+
+    img {
+      width: 10px;
+      height: 18px;
+    }
   }
 `;
 
@@ -50,6 +57,10 @@ export const MapTabs = styled.div`
   margin-top: 8px;
 
   button {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
     min-width: 54px;
     height: 34px;
     padding: 0 15px;
@@ -225,14 +236,15 @@ export const PlaceNavigation = styled.div`
     border: 0;
     color: #fff;
     background: transparent;
-    font-size: 32px;
-    line-height: 30px;
     cursor: pointer;
+
+    img {
+      display: block;
+      max-width: 20px;
+      max-height: 20px;
+    }
   }
 
-  button:last-child {
-    font-size: 24px;
-  }
 `;
 
 export const GalleryIndicator = styled.div`

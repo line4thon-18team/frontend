@@ -6,6 +6,11 @@ import googleMapsLogo from "../../assets/images/brand-google-maps.webp";
 import routeMap from "../../assets/course-completion/route-map.png";
 import searchIcon from "../../assets/course-completion/search.svg";
 import settingsIcon from "../../assets/course-completion/settings.svg";
+import backIcon from "../../assets/icons/nav-back.svg";
+import closeIcon from "../../assets/icons/action-close.svg";
+import airplaneIcon from "../../assets/icons/transport-airplane.svg";
+import bedIcon from "../../assets/icons/transport-bed.svg";
+import carIcon from "../../assets/icons/transport-car.svg";
 import { routes } from "../../config/routes";
 import {
   directTripDays,
@@ -32,7 +37,7 @@ const emptyDayPlaces: Record<number, string[]> = {
 };
 
 function BackIcon() {
-  return <span aria-hidden="true">‹</span>;
+  return <img src={backIcon} alt="" />;
 }
 
 function DirectTripBuilder() {
@@ -195,17 +200,17 @@ function DirectTripBuilder() {
           <p>지금 입력하지 않아도 나중에 일정에서 추가할 수 있어요.</p>
           <S.OptionalGrid>
             <button type="button">
-              <span>✈</span>
+              <span><img src={airplaneIcon} alt="" /></span>
               <strong>항공권</strong>
               <small>항공편 추가</small>
             </button>
             <button type="button">
-              <span>⌂</span>
+              <span><img src={bedIcon} alt="" /></span>
               <strong>숙소</strong>
               <small>숙소 추가</small>
             </button>
             <button type="button">
-              <span>🚗</span>
+              <span><img src={carIcon} alt="" /></span>
               <strong>렌터카</strong>
               <small>차량 추가</small>
             </button>
@@ -339,7 +344,7 @@ function DirectTripBuilder() {
                       onClick={() => removePlace(place.id)}
                       aria-label={`${place.name} 삭제`}
                     >
-                      ×
+                      <img src={closeIcon} alt="" />
                     </button>
                   </S.TimelineCard>
                   {index < placesForDay.length - 1 && (
@@ -383,7 +388,7 @@ function DirectTripBuilder() {
             />
             {query && (
               <button type="button" onClick={() => setQuery("")} aria-label="검색어 지우기">
-                ×
+                <img src={closeIcon} alt="" />
               </button>
             )}
           </label>

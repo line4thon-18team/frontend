@@ -3,6 +3,7 @@ import cameraIcon from "../../assets/course-settings/camera.svg";
 import deleteIcon from "../../assets/course-settings/delete.svg";
 import memberIcon from "../../assets/course-settings/member.svg";
 import pinIcon from "../../assets/course-settings/pin.svg";
+import chevronIcon from "../../assets/figma/settings-chevron.svg";
 import type { CourseSettingsSheet } from "../../types/courseSettings";
 import * as S from "./CourseSettings.styled";
 
@@ -25,7 +26,7 @@ function CourseSettingsMenu({
           <S.MenuButton type="button" onClick={() => onOpenSheet("trip")}>
             <img src={pinIcon} alt="" />
             <span>내 여행 수정</span>
-            <S.Chevron aria-hidden="true">›</S.Chevron>
+            <S.Chevron src={chevronIcon} alt="" />
           </S.MenuButton>
           <S.MenuButton
             type="button"
@@ -35,7 +36,7 @@ function CourseSettingsMenu({
           >
             <img src={cameraIcon} alt="" />
             <span>대표 이미지 수정</span>
-            <S.Chevron aria-hidden="true">›</S.Chevron>
+            <S.Chevron src={chevronIcon} alt="" />
           </S.MenuButton>
         </S.MenuList>
       </S.SettingsSection>
@@ -53,7 +54,7 @@ function CourseSettingsMenu({
           >
             <img src={bellIcon} alt="" />
             <span>알림 설정</span>
-            <S.Chevron aria-hidden="true">›</S.Chevron>
+            <S.Chevron src={chevronIcon} alt="" />
           </S.MenuButton>
           <S.MenuButton
             type="button"
@@ -63,7 +64,7 @@ function CourseSettingsMenu({
           >
             <img src={deleteIcon} alt="" />
             <span>코스 삭제하기</span>
-            <S.Chevron aria-hidden="true">›</S.Chevron>
+            <S.Chevron src={chevronIcon} alt="" />
           </S.MenuButton>
         </S.MenuList>
       </S.SettingsSection>
@@ -76,14 +77,12 @@ function CourseSettingsMenu({
           <S.MenuButton type="button" onClick={onOpenCommunity}>
             <img src={memberIcon} alt="" />
             <span>함께 계획하기</span>
-            <S.Chevron aria-hidden="true">›</S.Chevron>
+            <S.Chevron src={chevronIcon} alt="" />
           </S.MenuButton>
           <S.MenuButton type="button" onClick={() => onOpenSheet("invite")}>
             <img src={memberIcon} alt="" />
             <span>친구 초대</span>
-            <S.ActionBadge $tone="cyan" aria-hidden="true">
-              ＋
-            </S.ActionBadge>
+            <S.ActionBadge $tone="cyan" aria-hidden="true" />
           </S.MenuButton>
           <S.MenuButton
             type="button"
@@ -95,9 +94,7 @@ function CourseSettingsMenu({
               <span />
             </S.LeaveIcon>
             <span>코스 나가기</span>
-            <S.ActionBadge $tone="pink" aria-hidden="true">
-              −
-            </S.ActionBadge>
+            <S.ActionBadge $tone="pink" aria-hidden="true" />
           </S.MenuButton>
         </S.MenuList>
       </S.SettingsSection>

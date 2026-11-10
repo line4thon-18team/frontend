@@ -46,6 +46,10 @@ export const Navigation = styled.nav`
   padding: 10px 20px;
 
   button {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
     border: 0;
     padding: 0;
     color: #fff;
@@ -53,10 +57,10 @@ export const Navigation = styled.nav`
     cursor: pointer;
   }
 
-  button:first-child {
-    font-size: 34px;
-    line-height: 22px;
-    transform: translateY(-1px);
+  button:first-child img {
+    display: block;
+    width: 8.11667px;
+    height: 14.5333px;
   }
 
   strong {
@@ -65,11 +69,14 @@ export const Navigation = styled.nav`
 `;
 
 export const Heart = styled.button<{ $saved: boolean }>`
-  font-size: 24px;
-  line-height: 1;
-  text-align: center;
-  color: ${({ $saved }) => ($saved ? "#fff" : "transparent")} !important;
-  -webkit-text-stroke: ${({ $saved }) => ($saved ? "0" : "1.6px #fff")};
+  width: 20px !important;
+  height: 20px !important;
+
+  img {
+    display: block;
+    width: 20px;
+    height: 20px;
+  }
 `;
 
 export const Content = styled.div`
@@ -158,13 +165,10 @@ export const Facts = styled.section`
     gap: 4px;
   }
 
-  b {
-    display: grid;
-    place-items: center;
+  img {
+    display: block;
     width: 24px;
     height: 24px;
-    color: #090738;
-    font-size: 17px;
   }
 
   strong {
@@ -339,8 +343,17 @@ export const Move = styled.p`
   font-size: 12px;
   font-weight: 700;
 
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  > img {
+    width: 14px;
+    height: 14px;
+  }
+
   span {
-    margin-left: 6px;
+    margin-left: 1px;
     padding-left: 7px;
     border-left: 1px solid #d1d1d6;
     color: #8a8a8e;

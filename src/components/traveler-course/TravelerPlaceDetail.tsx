@@ -1,4 +1,7 @@
 import { useState } from "react";
+import backIcon from "../../assets/figma/traveler-back.svg";
+import heartIcon from "../../assets/figma/traveler-heart.svg";
+import heartFilledIcon from "../../assets/figma/traveler-heart-filled.svg";
 import { sannenzakaDetail } from "../../data/mocks/travelerCourseData";
 import * as S from "./TravelerCourseOverlay.styled";
 
@@ -15,8 +18,8 @@ function TravelerPlaceDetail({ onBack }: TravelerPlaceDetailProps) {
       <S.PlaceHero>
         <img src={sannenzakaDetail.hero} alt="산넨자카 골목" />
         <S.PlaceNavigation>
-          <button type="button" aria-label="지도 화면으로 돌아가기" onClick={onBack}>‹</button>
-          <button type="button" aria-label={saved ? "장소 저장 해제" : "장소 저장"} onClick={() => setSaved((value) => !value)}>{saved ? "♥" : "♡"}</button>
+          <button type="button" aria-label="지도 화면으로 돌아가기" onClick={onBack}><img src={backIcon} alt="" /></button>
+          <button type="button" aria-label={saved ? "장소 저장 해제" : "장소 저장"} onClick={() => setSaved((value) => !value)}><img src={saved ? heartFilledIcon : heartIcon} alt="" /></button>
         </S.PlaceNavigation>
         <S.GalleryIndicator>1 / {sannenzakaDetail.gallery.length}</S.GalleryIndicator>
       </S.PlaceHero>

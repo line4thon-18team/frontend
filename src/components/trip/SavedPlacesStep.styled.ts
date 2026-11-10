@@ -226,6 +226,30 @@ export const CourseCard = styled.div`
     text-align: center;
     font-size: 13px;
     color: #090738;
+
+    img {
+      width: 14px;
+      height: 14px;
+      margin-left: 3px;
+      vertical-align: -2px;
+    }
+  }
+`;
+export const CoursePath = styled.p`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  img {
+    width: 12px;
+    height: 12px;
   }
 `;
 export const CoursePhotos = styled.div`
@@ -442,5 +466,12 @@ export const RecommendHeading = styled.div`
     color: #090738;
     font-size: 12px;
     line-height: 20px;
+
+    img {
+      width: 12px;
+      height: 12px;
+      margin-left: 2px;
+      vertical-align: -2px;
+    }
   }
 `;
