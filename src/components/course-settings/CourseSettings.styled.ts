@@ -71,12 +71,14 @@ export const Navigation = styled.nav`
 `;
 
 export const SettingsContent = styled.div`
-  padding: 29px 20px 80px;
+  padding: 16px 0 80px;
 `;
 
 export const SettingsSection = styled.section`
+  padding: 0 20px;
+
   h2 {
-    margin: 0 0 13px 4px;
+    margin: 0 0 4px;
     color: #8a8a8e;
     font-size: 12px;
     line-height: 1.4;
@@ -88,16 +90,16 @@ export const SettingsSection = styled.section`
 export const MenuList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
 `;
 
-export const MenuButton = styled.button`
+export const MenuButton = styled.button<{ $danger?: boolean }>`
   width: 100%;
   min-height: 52px;
-  padding: 12px 4px 12px 5px !important;
+  padding: 14px 0 !important;
   display: grid;
-  grid-template-columns: 24px 1fr 28px;
-  gap: 14px;
+  grid-template-columns: 28px minmax(0, 1fr) auto 16px;
+  gap: 12px;
   align-items: center;
   text-align: left;
   border-radius: 10px !important;
@@ -113,6 +115,7 @@ export const MenuButton = styled.button`
   }
 
   > span:nth-child(2) {
+    color: ${({ $danger }) => ($danger ? "#e43d4c" : "#1a1a1a")};
     font-size: 16px;
     line-height: 1.5;
     font-weight: 500;
@@ -120,17 +123,49 @@ export const MenuButton = styled.button`
   }
 `;
 
+export const MenuMeta = styled.span`
+  grid-column: 3;
+  color: #8a8a8e !important;
+  font-size: 13px !important;
+  line-height: 18px !important;
+  font-weight: 400 !important;
+  white-space: nowrap;
+`;
+
+export const IconStack = styled.span`
+  position: relative;
+  width: 28px;
+  height: 24px;
+
+  img:first-child {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 24px;
+    height: 24px;
+  }
+
+  img:last-child {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 13px;
+    height: 13px;
+  }
+`;
+
 export const Chevron = styled.img`
+  grid-column: 4;
   width: 16px !important;
   height: 16px !important;
 `;
 
 export const Divider = styled.hr`
   width: 100%;
-  height: 1px;
-  margin: 25px 0 27px;
+  height: 8px;
+  margin: 0 0 16px;
   border: 0;
-  background: #ececf0;
+  background: #f3f5fa;
 `;
 
 export const ActionBadge = styled.span<{ $tone: "cyan" | "pink" }>`
@@ -221,6 +256,18 @@ export const LiveRegion = styled.p`
   text-align: center;
 `;
 
+export const HomeIndicator = styled.div`
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 8px;
+  width: 134px;
+  height: 5px;
+  border-radius: 999px;
+  background: #000000;
+  transform: translateX(-50%);
+`;
+
 export const SheetLayer = styled.div`
   position: fixed;
   z-index: 20;
@@ -246,6 +293,400 @@ export const BottomSheet = styled.section`
 
   &::-webkit-scrollbar {
     display: none;
+  }
+`;
+
+export const CoverContent = styled.div`
+  > p {
+    margin: -6px 0 20px;
+    color: #8a8a8e;
+    font-size: 13px;
+    line-height: 18px;
+  }
+`;
+
+export const CoverGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 8px;
+
+  > button,
+  > label {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 0;
+    border-radius: 12px;
+  }
+
+  > button {
+    outline: 0 solid #090738;
+  }
+
+  > button[aria-pressed="true"] {
+    outline-width: 3px;
+    outline-offset: -3px;
+  }
+
+  > button > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  > button > span {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+  }
+
+  > button > span img {
+    width: 100%;
+    height: 100%;
+  }
+
+  > label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: #f3f5fa;
+    color: #5c5c63;
+    cursor: pointer;
+  }
+
+  label strong {
+    color: #5c5c63;
+    font-size: 28px;
+    line-height: 28px;
+    font-weight: 300;
+  }
+
+  label span {
+    font-size: 12px;
+  }
+
+  label input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+`;
+
+export const SheetPrimaryButton = styled.button`
+  width: 100%;
+  height: 56px;
+  margin-top: 24px;
+  border-radius: 14px !important;
+  background: #090738 !important;
+  color: #ffffff !important;
+  font-size: 16px;
+  font-weight: 700;
+`;
+
+export const DurationContent = styled.div`
+  > p {
+    margin: -6px 0 24px;
+    color: #8a8a8e;
+    font-size: 13px;
+    line-height: 18px;
+  }
+`;
+
+export const DurationControl = styled.div`
+  min-height: 92px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 16px;
+  border-radius: 16px;
+  background: #f3f5fa;
+
+  button,
+  button img {
+    width: 44px;
+    height: 44px;
+  }
+
+  button {
+    border: 1px solid #e2e3e9 !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+  }
+
+  button:last-child {
+    border-color: #090738 !important;
+    background: #090738 !important;
+  }
+
+  button:disabled {
+    opacity: 0.35;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  strong {
+    font-size: 24px;
+    line-height: 34px;
+  }
+
+  span {
+    color: #8a8a8e;
+    font-size: 12px;
+  }
+`;
+
+export const DetailNavigation = styled.nav`
+  height: 42px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  button,
+  button img {
+    width: 22px;
+    height: 22px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 17px;
+    line-height: 24px;
+    font-weight: 700;
+  }
+`;
+
+export const MemberBody = styled.div`
+  padding: 16px 20px;
+
+  > p {
+    margin: 0 0 6px;
+    color: #8a8a8e;
+    font-size: 12px;
+    line-height: 17px;
+  }
+`;
+
+export const MemberCard = styled.div`
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 12px;
+  align-items: center;
+
+  > img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  strong {
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  strong span,
+  small {
+    color: #8a8a8e;
+    font-weight: 400;
+  }
+
+  small {
+    font-size: 12px;
+  }
+
+  em {
+    padding: 4px 10px;
+    border-radius: 99px;
+    background: #f3f5fa;
+    color: #5c5c63;
+    font-size: 12px;
+    font-style: normal;
+  }
+`;
+
+export const EmptyMembers = styled.section`
+  margin-top: 24px;
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 16px;
+  background: #f3f5fa;
+
+  > strong {
+    margin-top: 18px;
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  > p {
+    margin: 6px 0 18px;
+    color: #5c5c63;
+    font-size: 13px;
+    line-height: 18px;
+  }
+
+  > button {
+    height: 40px;
+    padding: 0 20px !important;
+    border-radius: 99px !important;
+    background: #090738 !important;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+`;
+
+export const AddMemberIcon = styled.div`
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #ffffff;
+
+  img:first-child {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    width: 28px;
+    height: 28px;
+  }
+
+  img:last-child {
+    position: absolute;
+    left: 28px;
+    top: 26px;
+    width: 18px;
+    height: 18px;
+  }
+`;
+
+export const NotificationBody = styled.div`
+  padding-top: 8px;
+`;
+
+export const NotificationSection = styled.section`
+  padding: 16px 20px 8px;
+  border-bottom: 8px solid #f3f5fa;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  h2 {
+    margin: 0 0 4px;
+    color: #8a8a8e;
+    font-size: 12px;
+    line-height: 17px;
+    font-weight: 500;
+  }
+`;
+
+export const NotificationRow = styled.div`
+  min-height: 74px;
+  display: grid;
+  grid-template-columns: 1fr 48px;
+  gap: 12px;
+  align-items: center;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  strong {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 500;
+  }
+
+  span {
+    color: #8a8a8e;
+    font-size: 13px;
+    line-height: 18px;
+  }
+
+  button,
+  button img {
+    width: 48px;
+    height: 28px;
+  }
+`;
+
+export const ConfirmLayer = styled.div`
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 40px;
+  background: rgba(10, 10, 26, 0.42);
+`;
+
+export const ConfirmDialog = styled.section`
+  width: 100%;
+  max-width: 322px;
+  padding: 28px 24px 20px;
+  border-radius: 20px;
+  background: #ffffff;
+  text-align: center;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 25px;
+  }
+
+  p {
+    margin: 8px 0 24px;
+    color: #5c5c63;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  button {
+    height: 50px;
+    border-radius: 12px !important;
+    background: #f3f5fa !important;
+    color: #5c5c63;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  button:last-child {
+    color: #ffffff;
+    background: #090738 !important;
+  }
+
+  button[data-danger] {
+    background: #ef4752 !important;
   }
 `;
 

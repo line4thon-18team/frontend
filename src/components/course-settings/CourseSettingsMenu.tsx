@@ -1,41 +1,48 @@
-import bellIcon from "../../assets/course-settings/bell.svg";
-import cameraIcon from "../../assets/course-settings/camera.svg";
-import deleteIcon from "../../assets/course-settings/delete.svg";
-import memberIcon from "../../assets/course-settings/member.svg";
-import pinIcon from "../../assets/course-settings/pin.svg";
+import bellIcon from "../../assets/course-settings-details/menu-bell.svg";
+import cameraIcon from "../../assets/course-settings-details/menu-camera.svg";
+import copyIcon from "../../assets/course-settings-details/menu-copy.svg";
+import daysIcon from "../../assets/course-settings-details/menu-days.svg";
+import deleteIcon from "../../assets/course-settings-details/menu-delete.svg";
+import inviteBadgeIcon from "../../assets/course-settings-details/member-add.svg";
+import inviteIcon from "../../assets/course-settings-details/menu-invite.svg";
+import memberIcon from "../../assets/course-settings-details/menu-members.svg";
+import originIcon from "../../assets/course-settings-details/menu-origin.svg";
+import pinIcon from "../../assets/course-settings-details/menu-pin.svg";
 import chevronIcon from "../../assets/figma/settings-chevron.svg";
 import type { CourseSettingsSheet } from "../../types/courseSettings";
 import * as S from "./CourseSettings.styled";
 
 interface CourseSettingsMenuProps {
   onOpenSheet: (sheet: CourseSettingsSheet) => void;
-  onOpenCommunity: () => void;
-  onNotice: (message: string) => void;
+  onOpenMembers: () => void;
+  onOpenNotifications: () => void;
+  onOpenClone: () => void;
+  onOpenDelete: () => void;
+  onOpenOrigin: () => void;
 }
 
 function CourseSettingsMenu({
   onOpenSheet,
-  onOpenCommunity,
-  onNotice,
+  onOpenMembers,
+  onOpenNotifications,
+  onOpenClone,
+  onOpenDelete,
+  onOpenOrigin,
 }: CourseSettingsMenuProps) {
   return (
     <S.SettingsContent>
-      <S.SettingsSection aria-labelledby="course-edit-heading">
-        <h2 id="course-edit-heading">코스 편집</h2>
+      <S.SettingsSection aria-labelledby="trip-info-heading">
+        <h2 id="trip-info-heading">여행 정보</h2>
         <S.MenuList>
           <S.MenuButton type="button" onClick={() => onOpenSheet("trip")}>
             <img src={pinIcon} alt="" />
-            <span>내 여행 수정</span>
+            <span>여행 정보 수정</span>
+            <S.MenuMeta>날짜, 동행 미등록</S.MenuMeta>
             <S.Chevron src={chevronIcon} alt="" />
           </S.MenuButton>
-          <S.MenuButton
-            type="button"
-            onClick={() =>
-              onNotice("피그마 목업의 오사카 대표 이미지를 적용했어요.")
-            }
-          >
+          <S.MenuButton type="button" onClick={() => onOpenSheet("cover")}>
             <img src={cameraIcon} alt="" />
-            <span>대표 이미지 수정</span>
+            <span>대표 이미지 변경</span>
             <S.Chevron src={chevronIcon} alt="" />
           </S.MenuButton>
         </S.MenuList>
@@ -43,58 +50,65 @@ function CourseSettingsMenu({
 
       <S.Divider />
 
-      <S.SettingsSection aria-labelledby="feature-heading">
-        <h2 id="feature-heading">기능</h2>
+      <S.SettingsSection aria-labelledby="together-heading">
+        <h2 id="together-heading">함께하기</h2>
         <S.MenuList>
-          <S.MenuButton
-            type="button"
-            onClick={() =>
-              onNotice("여행 일정 변경 알림을 켰어요.")
-            }
-          >
+          <S.MenuButton type="button" onClick={() => onOpenSheet("invite")}>
+            <S.IconStack>
+              <img src={inviteIcon} alt="" />
+              <img src={inviteBadgeIcon} alt="" />
+            </S.IconStack>
+            <span>친구 초대</span>
+            <S.Chevron src={chevronIcon} alt="" />
+          </S.MenuButton>
+          <S.MenuButton type="button" onClick={onOpenMembers}>
+            <img src={memberIcon} alt="" />
+            <span>멤버 관리</span>
+            <S.MenuMeta>1명</S.MenuMeta>
+            <S.Chevron src={chevronIcon} alt="" />
+          </S.MenuButton>
+        </S.MenuList>
+      </S.SettingsSection>
+
+      <S.Divider />
+
+      <S.SettingsSection aria-labelledby="schedule-heading">
+        <h2 id="schedule-heading">일정 관리</h2>
+        <S.MenuList>
+          <S.MenuButton type="button" onClick={() => onOpenSheet("duration")}>
+            <img src={daysIcon} alt="" />
+            <span>여행 기간 변경</span>
+            <S.MenuMeta>2박 3일</S.MenuMeta>
+            <S.Chevron src={chevronIcon} alt="" />
+          </S.MenuButton>
+          <S.MenuButton type="button" onClick={onOpenOrigin}>
+            <img src={originIcon} alt="" />
+            <span>원본 코스 보기</span>
+            <S.MenuMeta>산책하는 유진</S.MenuMeta>
+            <S.Chevron src={chevronIcon} alt="" />
+          </S.MenuButton>
+          <S.MenuButton type="button" onClick={onOpenClone}>
+            <img src={copyIcon} alt="" />
+            <span>코스 복제</span>
+            <S.Chevron src={chevronIcon} alt="" />
+          </S.MenuButton>
+        </S.MenuList>
+      </S.SettingsSection>
+
+      <S.Divider />
+
+      <S.SettingsSection aria-labelledby="other-heading">
+        <h2 id="other-heading">기타</h2>
+        <S.MenuList>
+          <S.MenuButton type="button" onClick={onOpenNotifications}>
             <img src={bellIcon} alt="" />
             <span>알림 설정</span>
             <S.Chevron src={chevronIcon} alt="" />
           </S.MenuButton>
-          <S.MenuButton
-            type="button"
-            onClick={() =>
-              onNotice("데모에서는 코스를 안전하게 유지하고 있어요.")
-            }
-          >
+          <S.MenuButton type="button" $danger onClick={onOpenDelete}>
             <img src={deleteIcon} alt="" />
-            <span>코스 삭제하기</span>
+            <span>코스 삭제</span>
             <S.Chevron src={chevronIcon} alt="" />
-          </S.MenuButton>
-        </S.MenuList>
-      </S.SettingsSection>
-
-      <S.Divider />
-
-      <S.SettingsSection aria-labelledby="member-heading">
-        <h2 id="member-heading">멤버</h2>
-        <S.MenuList>
-          <S.MenuButton type="button" onClick={onOpenCommunity}>
-            <img src={memberIcon} alt="" />
-            <span>함께 계획하기</span>
-            <S.Chevron src={chevronIcon} alt="" />
-          </S.MenuButton>
-          <S.MenuButton type="button" onClick={() => onOpenSheet("invite")}>
-            <img src={memberIcon} alt="" />
-            <span>친구 초대</span>
-            <S.ActionBadge $tone="cyan" aria-hidden="true" />
-          </S.MenuButton>
-          <S.MenuButton
-            type="button"
-            onClick={() =>
-              onNotice("데모에서는 멤버 상태를 그대로 유지하고 있어요.")
-            }
-          >
-            <S.LeaveIcon aria-hidden="true">
-              <span />
-            </S.LeaveIcon>
-            <span>코스 나가기</span>
-            <S.ActionBadge $tone="pink" aria-hidden="true" />
           </S.MenuButton>
         </S.MenuList>
       </S.SettingsSection>

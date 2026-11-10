@@ -1,4 +1,8 @@
-export type CourseSettingsSheet = "trip" | "invite";
+export type CourseSettingsSheet = "trip" | "invite" | "cover" | "duration";
+
+export type CourseSettingsView = "menu" | "members" | "notifications";
+
+export type CourseSettingsDialog = "clone" | "delete" | null;
 
 export interface CourseSettingsMember {
   name: string;

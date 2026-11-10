@@ -4,6 +4,13 @@ import editIcon from "../../assets/course-settings/edit.svg";
 import linkIcon from "../../assets/course-settings/link.svg";
 import successCheck from "../../assets/course-settings/success-check.svg";
 import successRing from "../../assets/course-settings/success-ring.svg";
+import coverOne from "../../assets/course-settings-details/cover-1.png";
+import coverTwo from "../../assets/course-settings-details/cover-2.png";
+import coverThree from "../../assets/course-settings-details/cover-3.png";
+import coverFour from "../../assets/course-settings-details/cover-4.png";
+import durationMinus from "../../assets/course-settings-details/duration-minus.svg";
+import durationPlus from "../../assets/course-settings-details/duration-plus.svg";
+import selectedCheck from "../../assets/course-settings-details/selected-check.svg";
 import {
   courseInviteLink,
   courseMembers,
@@ -30,7 +37,22 @@ interface CourseSettingsSheetProps {
   onNotice: (message: string) => void;
   onClose: () => void;
   initialCloseConfirm?: boolean;
+  selectedCover: number;
+  tripDays: number;
+  onCoverChange: (index: number) => void;
+  onSaveCover: () => void;
+  onTripDaysChange: (days: number) => void;
+  onSaveDuration: () => void;
 }
+
+const sheetTitles: Record<SheetName, string> = {
+  trip: "여행 정보 수정",
+  invite: "친구 초대",
+  cover: "대표 이미지 변경",
+  duration: "여행 기간 변경",
+};
+
+const coverImages = [coverOne, coverTwo, coverThree, coverFour];
 
 function CourseSettingsSheet({
   activeSheet,
@@ -50,6 +72,12 @@ function CourseSettingsSheet({
   onNotice,
   onClose,
   initialCloseConfirm = false,
+  selectedCover,
+  tripDays,
+  onCoverChange,
+  onSaveCover,
+  onTripDaysChange,
+  onSaveDuration,
 }: CourseSettingsSheetProps) {
   const [showCloseConfirm, setShowCloseConfirm] = useState(
     initialCloseConfirm,
@@ -80,7 +108,7 @@ function CourseSettingsSheet({
         <S.Grabber />
         <S.SheetHeader>
           <h2 id={`${activeSheet}-sheet-title`}>
-            {activeSheet === "trip" ? "내 여행 수정" : "친구 초대"}
+            {sheetTitles[activeSheet]}
           </h2>
           <button
             type="button"
@@ -92,7 +120,7 @@ function CourseSettingsSheet({
           </button>
         </S.SheetHeader>
 
-        {activeSheet === "trip" ? (
+        {activeSheet === "trip" && (
           <S.TripDetails>
             <S.DetailRow>
               <dt>여행 이름</dt>
@@ -137,7 +165,8 @@ function CourseSettingsSheet({
               <dd>대중교통</dd>
             </S.DetailRow>
           </S.TripDetails>
-        ) : (
+        )}
+        {activeSheet === "invite" && (
           <S.InviteContent>
             <S.LinkBox>
               <img src={linkIcon} alt="" />
@@ -194,6 +223,36 @@ function CourseSettingsSheet({
               </S.ShareList>
             </S.ShareSection>
           </S.InviteContent>
+        )}
+        {activeSheet === "cover" && (
+          <S.CoverContent>
+            <p>코스에 담긴 장소 사진 중에서 골라주세요</p>
+            <S.CoverGrid>
+              {coverImages.map((image, index) => (
+                <button key={image} type="button" aria-label={`대표 이미지 ${index + 1} 선택`} aria-pressed={selectedCover === index} onClick={() => onCoverChange(index)}>
+                  <img src={image} alt="" />
+                  {selectedCover === index && <span><img src={selectedCheck} alt="" /></span>}
+                </button>
+              ))}
+              <label>
+                <strong aria-hidden="true">＋</strong>
+                <span>앨범에서 선택</span>
+                <input type="file" accept="image/*" aria-label="앨범에서 대표 이미지 선택" onChange={() => onNotice("앨범에서 고른 사진을 대표 이미지 후보에 추가했어요.")} />
+              </label>
+            </S.CoverGrid>
+            <S.SheetPrimaryButton type="button" onClick={onSaveCover}>변경하기</S.SheetPrimaryButton>
+          </S.CoverContent>
+        )}
+        {activeSheet === "duration" && (
+          <S.DurationContent>
+            <p>지금 코스는 {tripDays}일 일정이에요</p>
+            <S.DurationControl>
+              <button type="button" aria-label="여행 기간 하루 줄이기" disabled={tripDays <= 1} onClick={() => onTripDaysChange(Math.max(1, tripDays - 1))}><img src={durationMinus} alt="" /></button>
+              <div><strong>{tripDays - 1}박 {tripDays}일</strong><span>1일차 ~ {tripDays}일차</span></div>
+              <button type="button" aria-label="여행 기간 하루 늘리기" disabled={tripDays >= 10} onClick={() => onTripDaysChange(Math.min(10, tripDays + 1))}><img src={durationPlus} alt="" /></button>
+            </S.DurationControl>
+            <S.SheetPrimaryButton type="button" onClick={onSaveDuration}>변경하기</S.SheetPrimaryButton>
+          </S.DurationContent>
         )}
       </S.BottomSheet>
 

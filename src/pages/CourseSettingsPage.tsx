@@ -2,20 +2,24 @@ import { useLocation, useNavigate } from "react-router";
 import backIcon from "../assets/course-settings/back.svg";
 import CourseSettingsMenu from "../components/course-settings/CourseSettingsMenu";
 import CourseSettingsSheet from "../components/course-settings/CourseSettingsSheet";
+import { CourseSettingsConfirmDialog, CourseSettingsDetailView } from "../components/course-settings/CourseSettingsDetails";
 import useCourseSettings from "../hooks/useCourseSettings";
+import { useEffect, useState } from "react";
 import * as S from "../components/course-settings/CourseSettings.styled";
-import {
-  readPlanOrigin,
-  settingsBackPath,
-  tripCommunityPath,
-} from "../utils/navigation";
+import { settingsBackPath } from "../utils/navigation";
 import { readMockScenario } from "../utils/mockScenario";
+import { routes } from "../config/routes";
+import type { CourseSettingsDialog, CourseSettingsView } from "../types/courseSettings";
 
 function CourseSettingsPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const showUnsavedMock =
     readMockScenario(location.search) === "settings-unsaved-close";
+  const [view, setView] = useState<CourseSettingsView>("menu");
+  const [dialog, setDialog] = useState<CourseSettingsDialog>(null);
+  const [selectedCover, setSelectedCover] = useState(0);
+  const [tripDays, setTripDays] = useState(3);
   const {
     activeSheet,
     tripName,
@@ -43,10 +47,29 @@ function CourseSettingsPage() {
       : {},
   );
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [view]);
+
+  const openInviteFromMembers = () => {
+    setView("menu");
+    openSheet("invite");
+  };
+
+  const confirmAction = () => {
+    if (dialog === "delete") {
+      setDialog(null);
+      navigate(routes.myTrips, { state: { courseDeleted: true } });
+      return;
+    }
+    setDialog(null);
+    setNotice("코스를 내 여행에 복제했어요.");
+  };
+
   return (
     <S.PageShell>
       <S.Page>
-        <S.Navigation aria-label="코스 설정 탐색">
+        {view === "menu" ? <><S.Navigation aria-label="코스 설정 탐색">
           <button
             type="button"
             aria-label="이전 화면으로 이동"
@@ -60,12 +83,17 @@ function CourseSettingsPage() {
 
         <CourseSettingsMenu
           onOpenSheet={openSheet}
-          onOpenCommunity={() =>
-            navigate(tripCommunityPath(readPlanOrigin(location.search)))
-          }
-          onNotice={setNotice}
+          onOpenMembers={() => setView("members")}
+          onOpenNotifications={() => setView("notifications")}
+          onOpenClone={() => setDialog("clone")}
+          onOpenDelete={() => setDialog("delete")}
+          onOpenOrigin={() => navigate("/courses/kyoto-walk")}
         />
         <S.LiveRegion aria-live="polite">{notice}</S.LiveRegion>
+        <S.HomeIndicator />
+        </> : (
+          <CourseSettingsDetailView view={view} onBack={() => setView("menu")} onInvite={openInviteFromMembers} />
+        )}
 
         {activeSheet && (
           <CourseSettingsSheet
@@ -86,8 +114,21 @@ function CourseSettingsPage() {
             onNotice={setNotice}
             onClose={closeSheet}
             initialCloseConfirm={showUnsavedMock}
+            selectedCover={selectedCover}
+            tripDays={tripDays}
+            onCoverChange={setSelectedCover}
+            onSaveCover={() => {
+              setNotice("대표 이미지를 변경했어요.");
+              closeSheet();
+            }}
+            onTripDaysChange={setTripDays}
+            onSaveDuration={() => {
+              setNotice(`여행 기간을 ${tripDays - 1}박 ${tripDays}일로 변경했어요.`);
+              closeSheet();
+            }}
           />
         )}
+        {dialog && <CourseSettingsConfirmDialog dialog={dialog} onCancel={() => setDialog(null)} onConfirm={confirmAction} />}
       </S.Page>
     </S.PageShell>
   );
