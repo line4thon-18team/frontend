@@ -44,6 +44,9 @@ function CoursePlan({ tripId }: { tripId: string }) {
     aiRequest,
     displayPlaces,
     isSaved,
+    isEditRequestPending,
+    editProgress,
+    editError,
     notice,
     places,
     planVariant,
@@ -65,17 +68,12 @@ function CoursePlan({ tripId }: { tripId: string }) {
     openPlaceDetail,
     removePlace,
     removeSelectedPlace,
+    requestAiEdit,
     saveManualEdit,
     savePlan,
     toggleCandidate,
     undoAiResult,
   } = useCoursePlan(tripId);
-
-  useEffect(() => {
-    if (screen !== "ai-loading") return;
-    const timer = window.setTimeout(() => setScreen("ai-result"), 1300);
-    return () => window.clearTimeout(timer);
-  }, [screen, setScreen]);
 
   useEffect(() => {
     if (["place-detail", "ai-loading", "ai-result"].includes(screen)) {
@@ -104,8 +102,8 @@ function CoursePlan({ tripId }: { tripId: string }) {
   if (screen === "ai-loading") {
     return (
       <div className="course-page-shell">
-        <div className="course-page">
-          <AiEditLoading onBack={() => setScreen("ai-edit")} />
+        <div className="course-page" aria-busy={isEditRequestPending}>
+          <AiEditLoading day={activeDay + 1} progress={editProgress} />
         </div>
       </div>
     );
@@ -191,7 +189,8 @@ function CoursePlan({ tripId }: { tripId: string }) {
             value={aiRequest}
             onChange={setAiRequest}
             onClose={() => setScreen("plan")}
-            onSubmit={() => setScreen("ai-loading")}
+            onSubmit={() => void requestAiEdit()}
+            error={editError}
           />
         )}
         {screen === "schedule-edit" && (

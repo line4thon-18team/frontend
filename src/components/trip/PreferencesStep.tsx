@@ -9,7 +9,7 @@ import * as P from "./PreferencesStep.styled";
 interface PreferencesStepProps {
   draft: TripDraft;
   onChange: (draft: TripDraft) => void;
-  onGenerate: () => void;
+  onGenerate: () => Promise<void>;
   error: string;
 }
 function PreferencesStep({
@@ -19,6 +19,7 @@ function PreferencesStep({
   error,
 }: PreferencesStepProps) {
   const [busy, setBusy] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const request = useRef<AbortController | null>(null);
   useEffect(() => () => request.current?.abort(), []);
   const preferences = draft.preferences;
@@ -33,7 +34,13 @@ function PreferencesStep({
   }
   async function submit() {
     if (preferences.analyzed) {
-      onGenerate();
+      if (submitting) return;
+      setSubmitting(true);
+      try {
+        await onGenerate();
+      } finally {
+        setSubmitting(false);
+      }
       return;
     }
     if (!preferences.text.trim()) {
@@ -139,11 +146,13 @@ function PreferencesStep({
         {error && <S.ErrorText role="alert">{error}</S.ErrorText>}
         <S.Primary
           type="button"
-          disabled={busy || !hasConditions}
+          disabled={busy || submitting || !hasConditions}
           onClick={submit}
         >
           {busy
             ? "여행 취향을 정리하고 있어요"
+            : submitting
+              ? "코스를 만들고 있어요"
             : preferences.analyzed
               ? "이대로 코스 만들기"
               : "코스 만들기"}

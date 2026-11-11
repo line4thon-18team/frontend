@@ -73,7 +73,8 @@ function AiTripCreatePage() {
             <br />
             만들고 있어요
           </h1>
-          <p>20초 정도 걸려요</p>
+          <p>최대 3분 정도 걸릴 수 있어요</p>
+          <S.GenerationNotice>화면을 닫지 않고 잠시 기다려 주세요</S.GenerationNotice>
         </div>
         <S.GenerationSteps>
           {phases.map((phase, index) => (
@@ -106,6 +107,7 @@ function AiTripCreatePage() {
       step={step}
       onBack={back}
       hideProgress={generating || importing}
+      backDisabled={generating}
     >
       {content}
     </Layout>

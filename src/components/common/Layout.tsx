@@ -9,6 +9,7 @@ interface LayoutProps {
   step?: number;
   onBack?: () => void;
   hideProgress?: boolean;
+  backDisabled?: boolean;
 }
 
 function Layout({
@@ -17,6 +18,7 @@ function Layout({
   step = 1,
   onBack,
   hideProgress = false,
+  backDisabled = false,
 }: LayoutProps) {
   const isCourses = variant === "courses";
   const isTrip = variant === "trip";
@@ -29,6 +31,7 @@ function Layout({
         step={step}
         onBack={onBack}
         hideProgress={hideProgress}
+        backDisabled={backDisabled}
       />
       <S.Content
         $courses={isCourses}

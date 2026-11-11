@@ -5,6 +5,7 @@ interface AiEditSheetProps {
   onChange: (value: string) => void;
   onClose: () => void;
   onSubmit: () => void;
+  error?: string;
 }
 
 const commonRequests = [
@@ -16,7 +17,7 @@ const commonRequests = [
   "이동 동선 줄이기",
 ];
 
-function AiEditSheet({ value, onChange, onClose, onSubmit }: AiEditSheetProps) {
+function AiEditSheet({ value, onChange, onClose, onSubmit, error = "" }: AiEditSheetProps) {
   return (
     <div className="course-overlay" role="presentation">
       <section className="course-sheet ai-edit-sheet" aria-label="AI 일정 수정 요청">
@@ -41,6 +42,7 @@ function AiEditSheet({ value, onChange, onClose, onSubmit }: AiEditSheetProps) {
             <button type="button" onClick={() => onChange(request)} key={request}>{request}</button>
           ))}
         </div>
+        {error && <p className="ai-edit-sheet__error" role="alert">{error}</p>}
         <button className="course-sheet__primary" type="button" onClick={onSubmit} disabled={!value.trim()}>
           수정 요청하기
         </button>

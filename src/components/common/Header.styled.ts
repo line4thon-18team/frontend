@@ -141,6 +141,10 @@ export const TripHeader = styled.header`
     min-width: 28px;
     min-height: 28px;
   }
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+  }
   span {
     font-size: 14px;
     color: #7b6fe9;

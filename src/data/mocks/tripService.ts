@@ -68,3 +68,13 @@ export async function generateMockTrip(
     throw new Error("일정을 만들지 못했어요. 다시 시도해 주세요");
   }
 }
+
+export async function requestMockAiEdit(
+  signal: AbortSignal,
+  onProgress: (step: number) => void,
+): Promise<void> {
+  for (let step = 0; step < 4; step++) {
+    onProgress(step);
+    await waitForMock(450, signal);
+  }
+}

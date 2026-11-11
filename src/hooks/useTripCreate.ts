@@ -13,6 +13,7 @@ import { mockTripCities, mockTripPlaces } from "../data/mocks/tripData";
 import { routes } from "../config/routes";
 import { createGeneratedTrip, saveMockTrip } from "../data/mocks/mockTripService";
 import { tripPlanPath } from "../utils/navigation";
+import { createRequestLock } from "../utils/requestLock";
 function initialDraft() {
   let saved: string | null = null;
   try {
@@ -45,6 +46,7 @@ function useTripCreate() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const request = useRef<AbortController | null>(null);
+  const requestLock = useRef(createRequestLock());
   const requested = Number(params.get("step") || 1);
   const bounded = [1, 2, 3].includes(requested) ? requested : 1;
   const step = basicError(draft)
@@ -73,20 +75,16 @@ function useTripCreate() {
     window.scrollTo(0, 0);
   }
   function back() {
-    if (generating) {
-      request.current?.abort();
-      request.current = null;
-      setGenerating(false);
-      return;
-    }
+    if (generating) return;
     if (step === 1) navigate(routes.home);
     else move(step - 1);
   }
   async function generate() {
-    if (request.current) return;
+    if (!requestLock.current.acquire()) return;
     const validation = basicError(draft) || placesError(draft);
     if (validation) {
       setError(validation);
+      requestLock.current.release();
       return;
     }
     const controller = new AbortController();
@@ -127,6 +125,7 @@ function useTripCreate() {
         request.current = null;
         if (!completed) setGenerating(false);
       }
+      requestLock.current.release();
     }
   }
   const phases = [

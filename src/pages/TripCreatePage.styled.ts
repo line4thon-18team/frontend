@@ -93,3 +93,10 @@ export const GenerationGlow = styled.img<{ $tone: "purple" | "cyan" }>`
   left: ${({ $tone }) => ($tone === "purple" ? "calc(50% - 176px)" : "calc(50% - 70px)")};
   top: ${({ $tone }) => ($tone === "purple" ? "-19px" : "35px")};
 `;
+
+export const GenerationNotice = styled.p`
+  margin: -16px 0 0 !important;
+  color: #5c5c63 !important;
+  font-size: 12px !important;
+  line-height: 17px;
+`;

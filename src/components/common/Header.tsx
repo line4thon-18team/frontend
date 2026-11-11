@@ -12,19 +12,26 @@ interface HeaderProps {
   step?: number;
   onBack?: () => void;
   hideProgress?: boolean;
+  backDisabled?: boolean;
 }
 function Header({
   variant = "home",
   step = 1,
   onBack,
   hideProgress = false,
+  backDisabled = false,
 }: HeaderProps) {
   return (
     <>
       {variant === "trip" ? (
         <>
           <S.TripHeader>
-            <button type="button" aria-label="이전 단계" onClick={onBack}>
+            <button
+              type="button"
+              aria-label={backDisabled ? "일정 생성 중에는 이전 단계로 이동할 수 없어요" : "이전 단계"}
+              onClick={onBack}
+              disabled={backDisabled}
+            >
               <img src={flowBack} alt="" />
             </button>
             {!hideProgress && <span>{step} / 3</span>}

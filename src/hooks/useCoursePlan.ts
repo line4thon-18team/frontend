@@ -1,10 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { replacementPlaces, suggestedPlaces } from "../data/mocks/courseCompletionData";
 import { mockTripPlaces } from "../data/mocks/tripData";
 import { placeIcon, readMockTrip, readTripStorageNotice, saveMockTrip, tripStorageNotice } from "../data/mocks/mockTripService";
 import { moveDayPlace } from "../utils/mockTrips";
 import type { CourseCandidate, CoursePlanVariant, CourseScreen } from "../types/courseCompletion";
 import type { MockTrip } from "../types/mockTrip";
+import { requestMockAiEdit } from "../data/mocks/tripService";
+import { createRequestLock } from "../utils/requestLock";
 
 function useCoursePlan(tripId: string) {
   const [trip, setTrip] = useState(() => readMockTrip(tripId));
@@ -19,6 +21,11 @@ function useCoursePlan(tripId: string) {
   const [replacementId, setReplacementId] = useState(201);
   const [replacementTargetId, setReplacementTargetId] = useState<number | null>(null);
   const [beforeAi, setBeforeAi] = useState<MockTrip | null>(null);
+  const [isEditRequestPending, setEditRequestPending] = useState(false);
+  const [editProgress, setEditProgress] = useState(0);
+  const [editError, setEditError] = useState("");
+  const editRequest = useRef<AbortController | null>(null);
+  const editRequestLock = useRef(createRequestLock());
   const [removedPlaces, setRemovedPlaces] = useState<Array<{ day: number; place: MockTrip["days"][number]["places"][number] }>>([]);
   const places = trip?.days[activeDay]?.places ?? [];
   const selectedPlace = places.find((place) => place.id === selectedPlaceId);
@@ -31,6 +38,8 @@ function useCoursePlan(tripId: string) {
   }, [trip?.city]);
   const replacements = trip?.city === "오사카" ? replacementPlaces : candidates;
   const displayPlaces = screen === "ai-result" ? places.filter((place) => !place.category.includes("카페")) : places;
+
+  useEffect(() => () => editRequest.current?.abort(), []);
 
   const updateTrip = (next: MockTrip, message: string) => {
     setTrip(next);
@@ -115,6 +124,39 @@ function useCoursePlan(tripId: string) {
     updatePlaces(moveDayPlace(trip.days[activeDay], fromId, toId).places, "장소 순서를 변경했어요.");
   };
 
+  const requestAiEdit = async () => {
+    if (!trip || !aiRequest.trim() || !editRequestLock.current.acquire()) return;
+
+    const controller = new AbortController();
+    editRequest.current = controller;
+    setEditRequestPending(true);
+    setEditProgress(0);
+    setEditError("");
+    setScreen("ai-loading");
+
+    try {
+      await requestMockAiEdit(controller.signal, setEditProgress);
+      if (controller.signal.aborted) return;
+      setEditProgress(4);
+      setScreen("ai-result");
+    } catch (reason) {
+      if (!controller.signal.aborted) {
+        setEditError(
+          reason instanceof Error
+            ? reason.message
+            : "일정을 수정하지 못했어요. 잠시 후 다시 시도해 주세요.",
+        );
+        setScreen("ai-edit");
+      }
+    } finally {
+      if (editRequest.current === controller) {
+        editRequest.current = null;
+        setEditRequestPending(false);
+      }
+      editRequestLock.current.release();
+    }
+  };
+
   const applyAiResult = () => {
     if (!trip) return;
     setBeforeAi(trip);
@@ -149,12 +191,13 @@ function useCoursePlan(tripId: string) {
 
   return {
     trip, activeDay, aiRequest, candidates, replacements, displayPlaces, isSaved,
+    isEditRequestPending, editProgress, editError,
     notice, places, planVariant, replacementId, screen, selectedCandidateIds,
     selectedPlace, removedPlaces: removedPlaces.filter((item) => item.day === activeDay),
     setActiveDay, setAiRequest, setReplacementId, setScreen, addRemovedPlace,
     addSelectedCandidates, applyAiResult, applyReplacement, openReplacement,
     openPlaceDetail, removePlace, removeSelectedPlace, reorderPlace,
-    saveManualEdit, savePlan, toggleCandidate, undoAiResult,
+    requestAiEdit, saveManualEdit, savePlan, toggleCandidate, undoAiResult,
   };
 }
 
