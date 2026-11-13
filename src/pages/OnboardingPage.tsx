@@ -21,7 +21,7 @@ import validCheckIcon from "../assets/onboarding/valid-check.svg";
 import welcomeCharacter from "../assets/onboarding/welcome-character.png";
 import { routes } from "../config/routes";
 import { policyPath, type PolicyDocumentId } from "../data/policyDocuments";
-import { parseProfileSettings, PROFILE_STORAGE_KEY, saveProfileSettings, validateNickname } from "../utils/mySettings";
+import { parseProfileSettings, PROFILE_STORAGE_KEY, saveProfileSettings, validateNickname, validateNicknameFormat } from "../utils/mySettings";
 import { allowDemoAuthentication } from "../utils/authNavigation";
 import * as S from "./OnboardingPage.styled";
 
@@ -195,7 +195,13 @@ function OnboardingPage() {
   }
 
   if (location.pathname === routes.onboardingProfile) {
-    const validation = validateNickname(nickname);
+    const validation = liveSession
+      ? validateNicknameFormat(nickname)
+      : validateNickname(nickname);
+    const changeNickname = (value: string) => {
+      setNickname(value);
+      setProfileError("");
+    };
     const continueProfile = async () => {
       if (!validation.valid || savingProfile) return;
       const value = nickname.trim();
@@ -207,8 +213,12 @@ function OnboardingPage() {
         setSavingProfile(true);
         try {
           const nicknameCheck = await checkNickname(value);
-          if (!nicknameCheck.available) {
+          if (nicknameCheck?.available === false) {
             setProfileError("이미 사용 중인 닉네임이에요.");
+            return;
+          }
+          if (nicknameCheck?.available !== true) {
+            setProfileError("닉네임을 확인하지 못했어요. 다시 시도해 주세요.");
             return;
           }
           await completeSignup({
@@ -259,20 +269,23 @@ function OnboardingPage() {
               maxLength={12}
               value={nickname}
               aria-invalid={!validation.valid}
-              onChange={(event) => {
-                setNickname(event.target.value);
-                setProfileError("");
-              }}
+              readOnly={savingProfile}
+              onChange={(event) => changeNickname(event.target.value)}
             />
             <small>{nickname.length}/12</small>
             {nickname && (
-              <button type="button" aria-label="닉네임 지우기" onClick={() => setNickname("")}>
+              <button
+                type="button"
+                aria-label="닉네임 지우기"
+                disabled={savingProfile}
+                onClick={() => changeNickname("")}
+              >
                 <img src={clearIcon} alt="" />
               </button>
             )}
           </S.NicknameField>
           <S.ValidText $error={!validation.valid || Boolean(profileError)} role="status">
-            {validation.valid && !profileError && <img src={validCheckIcon} alt="" />}
+            {validation.valid && !savingProfile && !profileError && <img src={validCheckIcon} alt="" />}
             {profileError ||
               (savingProfile
                 ? "가입 정보를 저장하고 있어요"

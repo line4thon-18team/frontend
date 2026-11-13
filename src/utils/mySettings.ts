@@ -65,6 +65,23 @@ export function validateNickname(
     return { valid: true, tone: "default", message: "" };
   }
 
+  const validation = validateNicknameFormat(value);
+  if (!validation.valid) return validation;
+
+  if (unavailableNicknames.has(value.toLowerCase())) {
+    return {
+      valid: false,
+      tone: "error",
+      message: "이미 사용 중인 닉네임이에요",
+    };
+  }
+
+  return validation;
+}
+
+export function validateNicknameFormat(nickname: string): NicknameValidation {
+  const value = nickname.trim();
+
   if (value.length < 2 || value.length > 12) {
     return {
       valid: false,
@@ -78,14 +95,6 @@ export function validateNickname(
       valid: false,
       tone: "error",
       message: "한글, 영문, 숫자만 입력할 수 있어요",
-    };
-  }
-
-  if (unavailableNicknames.has(value.toLowerCase())) {
-    return {
-      valid: false,
-      tone: "error",
-      message: "이미 사용 중인 닉네임이에요",
     };
   }
 
