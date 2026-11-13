@@ -71,6 +71,9 @@ function OptionalInfoSheet({
   const [rentalPlaceId, setRentalPlaceId] = useState(draft.rental?.placeId);
   const [remotePlaces, setRemotePlaces] = useState<PlaceCandidate[]>();
   const [searchError, setSearchError] = useState("");
+  const [staySearch, setStaySearch] = useState<
+    { query: string; results: PlaceCandidate[] } | { query: string; error: string }
+  >();
   const timelineRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{ id: string; edge: "start" | "end" } | null>(null);
   const dates = rangeDates(draft.startDate, draft.endDate);
@@ -90,30 +93,45 @@ function OptionalInfoSheet({
   });
   const liveReservations =
     isApiEnabled() && hasAuthSession() && isServerTripId(draft.tripId);
+  const demoStaySearch = !isApiEnabled();
+  const settledStaySearch = staySearch?.query === hotelQuery.trim() ? staySearch : undefined;
   const activePlaceQuery = mode === "stay" ? hotelQuery : location;
   const hotels = liveReservations
-    ? (remotePlaces ?? []).map((place) => ({ ...place, city: draft.city }))
-    : mockHotels.filter(
+    ? (settledStaySearch && "results" in settledStaySearch ? settledStaySearch.results : [])
+        .map((place) => ({ ...place, city: draft.city }))
+    : demoStaySearch ? mockHotels.filter(
         (hotel) =>
           hotel.name.toLowerCase().includes(hotelQuery.trim().toLowerCase()) ||
           hotel.address.includes(hotelQuery.trim()),
-      );
+      ) : [];
 
   useEffect(() => {
     const query = activePlaceQuery.trim();
-    if (!liveReservations || (mode === "stay" && !isSearching) || query.length < 2) {
+    if (!liveReservations || mode === "flight" ||
+      (mode === "stay" ? !isSearching || !query : query.length < 2)) {
       return;
     }
     if (mode === "car" && rentalPlaceId) return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
-      setSearchError("");
+      if (mode === "car") setSearchError("");
       void searchPlaces(Number(draft.tripId), query, controller.signal).then(
         (results) => {
-          if (!controller.signal.aborted) setRemotePlaces(results);
+          if (controller.signal.aborted) return;
+          if (mode === "stay") {
+            setStaySearch(Array.isArray(results)
+              ? { query, results }
+              : { query, error: "숙소를 검색하지 못했어요. 다시 시도해 주세요." });
+          } else {
+            setRemotePlaces(results);
+          }
         },
         (reason: unknown) => {
           if (!controller.signal.aborted) {
+            if (mode === "stay") {
+              setStaySearch({ query, error: "숙소를 검색하지 못했어요. 다시 시도해 주세요." });
+              return;
+            }
             setRemotePlaces([]);
             setSearchError(reason instanceof Error ? reason.message : "장소를 검색하지 못했어요.");
           }
@@ -626,6 +644,7 @@ function OptionalInfoSheet({
                               setActiveStayId(stay.id);
                               setEditingId(stay.id);
                               setHotelQuery(stay.name);
+                              setStaySearch(undefined);
                               setIsSearching(true);
                             }}
                           >
@@ -647,6 +666,7 @@ function OptionalInfoSheet({
                         onClick={() => {
                           setEditingId(null);
                           setHotelQuery("");
+                          setStaySearch(undefined);
                           setIsSearching(true);
                         }}
                       >
@@ -677,7 +697,7 @@ function OptionalInfoSheet({
                   onChange={(event) => {
                     setHotelQuery(event.target.value);
                     setPendingHotel(null);
-                    setRemotePlaces(undefined);
+                    if (event.target.value.trim() !== hotelQuery.trim()) setStaySearch(undefined);
                   }}
                 />
               </S.Search>
@@ -693,9 +713,19 @@ function OptionalInfoSheet({
                   </button>
                 ))}
               </S.Results>
-              {hotelQuery.trim() && !hotels.length && (
+              {!liveReservations && !demoStaySearch && (
+                <S.Help role="status">저장된 여행에서 숙소를 검색할 수 있어요.</S.Help>
+              )}
+              {liveReservations && hotelQuery.trim() && !settledStaySearch && (
+                <S.Help role="status">숙소를 검색하고 있어요.</S.Help>
+              )}
+              {settledStaySearch && "error" in settledStaySearch && (
+                <S.ErrorText role="alert">{settledStaySearch.error}</S.ErrorText>
+              )}
+              {hotelQuery.trim() && !hotels.length &&
+                (demoStaySearch || (settledStaySearch && "results" in settledStaySearch)) && (
                 <>
-                  <S.Help>
+                  <S.Help role="status">
                     {liveReservations
                       ? "숙소 검색 결과가 없어요. 다른 이름으로 검색해 주세요."
                       : "숙소 검색 결과가 없어요. 주소를 직접 입력해 주세요."}
@@ -720,7 +750,6 @@ function OptionalInfoSheet({
                   </S.Chip>}
                 </>
               )}
-              {searchError && <S.ErrorText role="alert">{searchError}</S.ErrorText>}
               {pendingHotel && (
                 <>
                   <S.ErrorText role="alert">

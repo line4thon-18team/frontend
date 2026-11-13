@@ -176,7 +176,7 @@ function ServerSavedPlaces({ tripId, onContinue, onPick, pickedPlaceIds }: Serve
                 setQuery(event.target.value);
                 setResults(undefined);
               }} />
-              <P.MatchButton type="submit" disabled={busy || !query.trim()}>검색</P.MatchButton>
+              <P.PlaceSearchButton type="submit" disabled={busy || !query.trim()}>검색</P.PlaceSearchButton>
             </S.Search>
           </form>
           {matchId !== undefined && <P.MatchButton type="button" disabled={busy} onClick={() => {
