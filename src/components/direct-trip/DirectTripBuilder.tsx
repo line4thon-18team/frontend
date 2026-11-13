@@ -22,6 +22,7 @@ import { mockTripPlaces } from "../../data/mocks/tripData";
 import searchIcon from "../../assets/course-completion/search.svg";
 import settingsIcon from "../../assets/course-completion/settings.svg";
 import backIcon from "../../assets/icons/nav-back.svg";
+import heroBackIcon from "../../assets/course-completion/back.svg";
 import closeIcon from "../../assets/icons/action-close.svg";
 import { routes } from "../../config/routes";
 import { serverTripPlanPath } from "../../utils/navigation";
@@ -376,17 +377,19 @@ function DirectTripBuilder({ existing }: { existing?: ExistingTrip } = {}) {
         <S.HeroScrim />
         <S.HeroHeader>
           <S.BackButton type="button" onClick={goBack} aria-label="뒤로 가기">
-            <BackIcon />
+            <img src={heroBackIcon} alt="" />
           </S.BackButton>
-          <div>
-            <small>내 일정</small>
-            <h1>{draft.city} {durationLabel(draft.startDate, draft.endDate)}</h1>
-            <p>{dateLabel(draft.startDate)} – {dateLabel(draft.endDate)}</p>
-          </div>
+          <small>내 일정</small>
           <button type="button" aria-label="일정 설정">
             <img src={settingsIcon} alt="" />
           </button>
         </S.HeroHeader>
+        <S.HeroTitle>
+          <div>
+            <h1>{draft.city} {durationLabel(draft.startDate, draft.endDate)}</h1>
+            <p>{dateLabel(draft.startDate)} – {dateLabel(draft.endDate)}</p>
+          </div>
+        </S.HeroTitle>
       </S.Hero>
 
       <S.PlanScroll>
