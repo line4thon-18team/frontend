@@ -22,6 +22,10 @@ export function getTrip(tripId: number, signal?: AbortSignal) {
   return apiRequest<TripResponse>(`/api/trips/${tripId}`, { signal });
 }
 
+export function deleteTrip(tripId: number) {
+  return apiRequest<void>(`/api/trips/${tripId}`, { method: "DELETE" });
+}
+
 export function createTrip(input: TripInput, signal?: AbortSignal) {
   return apiRequest<TripResponse>("/api/trips", {
     method: "POST",
