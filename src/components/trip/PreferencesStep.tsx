@@ -229,6 +229,15 @@ function PreferencesStep({
     preferences.tastes.length ||
     preferences.pace.length ||
     preferences.companion.length;
+  if (busy) {
+    return (
+      <P.AnalysisProgress role="status">
+        <span aria-hidden="true" />
+        <p>여행 취향을 분석하고 있어요</p>
+      </P.AnalysisProgress>
+    );
+  }
+
   return (
     <>
       <P.Preferences>
@@ -291,13 +300,11 @@ function PreferencesStep({
         )}
         <S.Primary
           type="button"
-          disabled={busy || loadingPreferences || submitting || !hasConditions}
+          disabled={loadingPreferences || submitting || !hasConditions}
           onClick={submit}
         >
           {loadingPreferences
             ? "저장된 취향을 불러오고 있어요"
-            : busy
-              ? "여행 취향을 정리하고 있어요"
             : submitting
               ? "코스를 만들고 있어요"
             : preferences.analyzed

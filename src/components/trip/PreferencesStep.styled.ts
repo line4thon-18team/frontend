@@ -1,5 +1,34 @@
 import { Step } from "./Trip.styled";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const rotate = keyframes`
+  to { transform: rotate(360deg); }
+`;
+
+export const AnalysisProgress = styled(Step)`
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px 0;
+  text-align: center;
+  color: #090738;
+  font-weight: 700;
+
+  span {
+    width: 36px;
+    height: 36px;
+    border: 3px solid #e2e1ee;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: ${rotate} 0.8s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  p { margin: 0; }
+`;
 export const Prompt = styled.div<{ $active: boolean; $analyzed: boolean }>`
   position: relative;
   margin-top: 35px;
