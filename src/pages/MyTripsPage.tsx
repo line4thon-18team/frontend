@@ -53,8 +53,13 @@ function MyTripsPage() {
   const query = searchParams.get("q") ?? "";
   const isSearching = searchParams.has("search");
   const isCreateOpen = searchParams.has("create");
-  const showSavedToast = searchParams.get("toast") === "saved";
-  const showImportedToast = searchParams.get("toast") === "course-imported";
+  const toastMessages = new Map([
+    ["saved", "여행 일정을 저장했어요"],
+    ["course-imported", "교토 2박 3일 일정을 가져왔어요"],
+    ["trip-deleted", "여행을 삭제했어요"],
+    ["trip-left", "여행에서 나왔어요"],
+  ]);
+  const toastMessage = toastMessages.get(searchParams.get("toast") ?? "");
   const myTrips = useMyTrips();
   const allTrips = myTrips.enabled
     ? myTrips.trips.map(apiTripToSummary)
@@ -84,10 +89,10 @@ function MyTripsPage() {
 
   return (
     <S.Page>
-      {(showSavedToast || showImportedToast) && (
+      {toastMessage && (
         <S.Toast role="status" aria-live="polite">
           <span>✓</span>
-          <strong>{showImportedToast ? "교토 2박 3일 일정을 가져왔어요" : "여행 일정을 저장했어요"}</strong>
+          <strong>{toastMessage}</strong>
           <button
             type="button"
             onClick={() => {

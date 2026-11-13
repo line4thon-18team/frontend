@@ -32,3 +32,9 @@ export function getTripMembers(tripId: number, signal?: AbortSignal) {
     signal,
   });
 }
+
+export function leaveTrip(tripId: number) {
+  return apiRequest<{ tripDeleted: boolean }>(`/api/trips/${tripId}/members/me`, {
+    method: "DELETE",
+  });
+}

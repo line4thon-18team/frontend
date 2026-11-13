@@ -183,7 +183,7 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
             <nav className="course-navigation" aria-label="코스 화면 탐색">
               <Link to={tripPlanBackPath(search)} aria-label="뒤로 가기"><img src={backIcon} alt="" /></Link>
               <strong>내 여행 코스</strong>
-              <Link to={tripSettingsPath(origin, "osaka", tripId)} aria-label="코스 설정 데모">
+              <Link to={tripSettingsPath(origin, undefined, tripId)} aria-label="코스 설정">
                 <img src={settingsIcon} alt="" />
               </Link>
             </nav>
