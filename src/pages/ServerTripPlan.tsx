@@ -17,11 +17,15 @@ import type {
   SavedPlaceResponse,
   TripResponse,
 } from "../api/types";
-import { resumeTripPath, tripPlanBackPath } from "../utils/navigation";
+import { readPlanOrigin, resumeTripPath, tripCommunityPath, tripPlanBackPath, tripSettingsPath } from "../utils/navigation";
 import { apiTripToDraft, apiTripToSummary } from "../utils/serverTrip";
 import { dateLabel } from "../utils/trip";
 import DirectTripBuilder from "../components/direct-trip/DirectTripBuilder";
 import ItineraryIssues from "../components/course-completion/ItineraryIssues";
+import CourseRouteMap from "../components/course-completion/CourseRouteMap";
+import TripSheet from "../components/common/TripSheet";
+import backIcon from "../assets/icons/nav-back.svg";
+import settingsIcon from "../assets/course-completion/settings.svg";
 
 interface TripPlanData {
   trip: TripResponse;
@@ -47,6 +51,7 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
   const [data, setData] = useState<TripPlanData>();
   const [error, setError] = useState("");
   const [activeDay, setActiveDay] = useState(0);
+  const [mapExpanded, setMapExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editMessage, setEditMessage] = useState("");
   const [editPreview, setEditPreview] = useState<ItineraryEditPreview>();
@@ -85,6 +90,15 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
   const summary = data && apiTripToSummary(data.trip);
   const days = data?.itinerary?.validation.days ?? [];
   const day = days[activeDay];
+  const origin = readPlanOrigin(search);
+  const placesById = new Map(data?.places.map((place) => [place.placeId, place]));
+  const placeCount = new Set(days.flatMap((item) => item.visits.map((visit) => visit.placeId))).size;
+  const mapPlaces = (day?.visits ?? []).flatMap((visit, index) => {
+    const place = placesById.get(visit.placeId);
+    if (typeof place?.latitude !== "number" || typeof place.longitude !== "number" ||
+      !Number.isFinite(place.latitude) || !Number.isFinite(place.longitude)) return [];
+    return [{ id: visit.itemId, name: place.name, latitude: place.latitude, longitude: place.longitude, order: index + 1 }];
+  });
   const excludedPlaceIds: string[] = Array.isArray(state?.excludedPlaceIds) ? state.excludedPlaceIds : [];
 
   const reloadHistory = async () => {
@@ -164,16 +178,40 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
   return (
     <div className="course-page-shell">
       <main className="course-page">
+        {data && summary && (
+          <header className="course-hero server-course-hero">
+            <nav className="course-navigation" aria-label="코스 화면 탐색">
+              <Link to={tripPlanBackPath(search)} aria-label="뒤로 가기"><img src={backIcon} alt="" /></Link>
+              <strong>내 여행 코스</strong>
+              <Link to={tripSettingsPath(origin, "osaka", tripId)} aria-label="코스 설정 데모">
+                <img src={settingsIcon} alt="" />
+              </Link>
+            </nav>
+            <p className="server-course-hero__placeholder">이미지 없음</p>
+            <div className="course-hero__title">
+              <span>{summary.city}</span>
+              <h1>{summary.title}</h1>
+              <p>{summary.dateLabel}</p>
+            </div>
+          </header>
+        )}
         <div className="course-content">
-          <Link to={tripPlanBackPath(search)}>여행 목록으로 돌아가기</Link>
+          {!data && <Link to={tripPlanBackPath(search)}>여행 목록으로 돌아가기</Link>}
           {error && <p role="alert">{error}</p>}
           {actionError && <p role="alert">{actionError}</p>}
           {notice && <p role="status">{notice}</p>}
           {!data && !error && <p role="status">여행 일정을 불러오고 있어요.</p>}
           {data && summary && (
             <section className="course-section">
-              <h1>{summary.title}</h1>
-              <p>{summary.dateLabel} · {apiTripToDraft(data.trip).companion} {data.trip.companionCount}명</p>
+              <div className="server-course-summary">
+                <p>AI 요약 문장 없음</p>
+                <ul aria-label="여행 요약">
+                  <li><strong>{summary.durationLabel}</strong><small>여행 기간</small></li>
+                  <li><strong>{placeCount}곳</strong><small>일정에 담긴 장소</small></li>
+                  <li><strong>{apiTripToDraft(data.trip).companion} {data.trip.companionCount}명</strong><small>동행</small></li>
+                </ul>
+              </div>
+              <Link to={tripCommunityPath(origin, "osaka", tripId)}>공동 계획 데모 열기</Link>
               {data.itinerary ? (
                 <>
                   <h2>일정</h2>
@@ -203,13 +241,25 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
                       </button>
                     ))}
                   </div>
+                  {day && (mapPlaces.length ? (
+                    <>
+                      <CourseRouteMap places={mapPlaces} city={summary.city} day={activeDay + 1} schematic />
+                      <button type="button" className="course-inline-edit" onClick={() => setMapExpanded(true)}>지도 확대</button>
+                    </>
+                  ) : <p>이날 지도에 표시할 장소 좌표가 없어요.</p>)}
+                  {mapExpanded && mapPlaces.length > 0 && (
+                    <TripSheet title={`${activeDay + 1}일차 지도`} onClose={() => setMapExpanded(false)}>
+                      <CourseRouteMap places={mapPlaces} city={summary.city} day={activeDay + 1} schematic expanded />
+                    </TripSheet>
+                  )}
                   {day?.visits.length ? (
-                    <ol>
+                    <ol className="server-course-timeline" aria-label={`${activeDay + 1}일차 장소 타임라인`}>
                       {day.visits.map((visit) => {
-                        const place = data.places.find((item) => item.placeId === visit.placeId);
+                        const place = placesById.get(visit.placeId);
                         return (
                           <li key={visit.itemId}>
                             <strong>{place?.name ?? "장소 정보 없음"}</strong>
+                            {place?.address && <small>{place.address}</small>}
                             <p>
                               {timeLabel(visit.start)} – {timeLabel(visit.end)}
                               {" · 이동 "}{visit.travel.minutes}분

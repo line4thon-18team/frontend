@@ -3,12 +3,17 @@ import type { CoursePlace } from "../../types/courseCompletion";
 import "./CourseCompletion.css";
 
 interface CourseRouteMapProps {
-  places: CoursePlace[];
+  places: Array<Pick<CoursePlace, "name" | "latitude" | "longitude"> & {
+    id: number | string;
+    order?: number;
+  }>;
   city: string;
   day: number;
+  schematic?: boolean;
+  expanded?: boolean;
 }
 
-function CourseRouteMap({ places, city, day }: CourseRouteMapProps) {
+function CourseRouteMap({ places, city, day, schematic = false, expanded = false }: CourseRouteMapProps) {
   const rows = Math.max(1, Math.ceil(places.length / 3));
   const hasCoordinates = places.every((place) =>
     Number.isFinite(place.latitude) && Number.isFinite(place.longitude),
@@ -22,22 +27,31 @@ function CourseRouteMap({ places, city, day }: CourseRouteMapProps) {
   const pins = places.map((place, index) => ({
     id: place.id,
     name: place.name,
+    order: place.order ?? index + 1,
     x: hasCoordinates ? 10 + ((place.longitude! - minLongitude) / longitudeRange) * 70 : 15 + (index % 3) * 35,
     y: hasCoordinates ? 80 - ((place.latitude! - minLatitude) / latitudeRange) * 60 : 20 + Math.floor(index / 3) * (60 / Math.max(1, rows - 1)),
   }));
 
   return (
-    <div className="course-map" aria-label={`${day}일차 ${city} 샘플 경로`}>
-      {city === "오사카" && <img className="course-map__base" src={routeMap} alt="오사카 샘플 지도" />}
+    <div className={`course-map${expanded ? " course-map--expanded" : ""}`} aria-label={`${day}일차 ${city} ${schematic ? "장소 배치도" : "샘플 경로"}`}>
+      {!schematic && city === "오사카" && <img className="course-map__base" src={routeMap} alt="오사카 샘플 지도" />}
       <svg className="course-map__route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <polyline points={pins.map((pin) => `${pin.x},${pin.y}`).join(" ")} fill="none" stroke="#00c6df" strokeWidth="1.2" />
+        <polyline
+          points={pins.map((pin) => `${pin.x},${pin.y}`).join(" ")}
+          fill="none"
+          stroke="#00c6df"
+          strokeWidth="3"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
       </svg>
-      {pins.map((pin, index) => (
+      {pins.map((pin) => (
         <span className="course-map__pin" style={{ left: `${pin.x}%`, top: `${pin.y}%` }} key={pin.id} title={pin.name}>
-          {index + 1}
+          {pin.order}
         </span>
       ))}
-      <small className="course-map__caption">{day}일차 · {places.length}곳 · 샘플 경로</small>
+      <small className="course-map__caption">{day}일차 · {places.length}곳 · {schematic ? "방문 순서" : "샘플 경로"}</small>
       <ol className="course-live-region">{places.map((place) => <li key={place.id}>{place.name}</li>)}</ol>
     </div>
   );

@@ -268,6 +268,73 @@
   object-fit: cover;
 }
 
+.course-map--expanded {
+  height: clamp(264px, 64dvh, 620px);
+}
+
+.course-hero.server-course-hero {
+  color: #090738;
+  background: #f3f5fa;
+}
+
+.server-course-hero .course-hero__title {
+  top: auto;
+  right: 20px;
+  bottom: 20px;
+  width: auto;
+}
+
+.server-course-hero .course-navigation strong {
+  text-shadow: none;
+}
+
+.server-course-hero .course-navigation a:last-child img {
+  filter: brightness(0);
+}
+
+.server-course-hero__placeholder {
+  position: absolute;
+  top: 42%;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  color: #60606b;
+}
+
+.server-course-summary ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  background: #f3f5fa;
+  list-style: none;
+  text-align: center;
+}
+
+.server-course-summary small,
+.server-course-timeline small {
+  display: block;
+  color: #60606b;
+}
+
+.server-course-timeline {
+  display: grid;
+  gap: 12px;
+  padding-inline-start: 28px;
+}
+
+.server-course-timeline li {
+  padding: 12px;
+  border: 1px solid #e2e1ee;
+  border-radius: 12px;
+}
+
+.server-course-timeline li::marker {
+  color: #007789;
+  font-weight: 700;
+}
+
 .course-map__line,
 .course-map__pin {
   position: absolute;
@@ -281,6 +348,7 @@
 
 .course-map__pin {
   display: grid;
+  transform: translate(-50%, -50%);
   width: 24px;
   height: 24px;
   border: 2.5px solid #fff;
