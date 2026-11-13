@@ -2,6 +2,7 @@ import { routes } from "../config/routes.ts";
 
 const publicRoutePatterns = [
   /^\/login\/?$/,
+  /^\/my\/account\/withdrawal\/complete\/?$/,
   /^\/auth\/callback\/google\/?$/,
   /^\/invite\/[^/]+\/?$/,
   /^\/my\/account\/policies\/[^/]+\/?$/,
