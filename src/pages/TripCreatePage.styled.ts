@@ -1,4 +1,15 @@
 import styled from "styled-components";
+
+export const LoadWarning = styled.p`
+  margin: 0 20px 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff4d6;
+  color: #6f5200;
+  font-size: 13px;
+  line-height: 1.5;
+`;
+
 export const Generation = styled.div`
   > * {
     flex-shrink: 0;

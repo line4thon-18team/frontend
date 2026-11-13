@@ -25,6 +25,7 @@ import { routes } from "../config/routes";
 import type { TripPlace } from "../types/trip";
 import { isApiEnabled } from "../api/config";
 import { hasAuthSession } from "../api/tokenStorage";
+import { tripResourceWarning } from "../utils/tripResources";
 
 function TripCreatePage() {
   const location = useLocation();
@@ -42,6 +43,7 @@ function ResumeTrip({ tripId }: { tripId: number }) {
     trip: TripResponse;
     places?: TripPlace[];
     reservations?: ReservationResponse;
+    loadWarning: string;
   }>();
   const [error, setError] = useState(false);
 
@@ -50,15 +52,23 @@ function ResumeTrip({ tripId }: { tripId: number }) {
     const { signal } = controller;
     void getTrip(tripId, signal).then(async (trip) => {
       if (signal.aborted) return;
-      const [saved, reservations] = await Promise.all([
-        getSavedPlaces(tripId, signal).catch(() => undefined),
-        getReservations(tripId, signal).catch(() => undefined),
+      const [savedResult, reservationsResult] = await Promise.allSettled([
+        getSavedPlaces(tripId, signal),
+        getReservations(tripId, signal),
       ]);
       if (!signal.aborted) {
+        const saved = savedResult.status === "fulfilled" ? savedResult.value : undefined;
+        const reservations = reservationsResult.status === "fulfilled"
+          ? reservationsResult.value
+          : undefined;
         setResumed({
           trip,
           places: saved?.places.map((place) => savedPlaceToTripPlace(place, trip.city)),
           reservations,
+          loadWarning: tripResourceWarning({
+            places: savedResult.status === "rejected",
+            reservations: reservationsResult.status === "rejected",
+          }),
         });
       }
     }).catch(() => { if (!signal.aborted) setError(true); });
@@ -70,6 +80,7 @@ function ResumeTrip({ tripId }: { tripId: number }) {
       trip={resumed.trip}
       places={resumed.places}
       reservations={resumed.reservations}
+      initialLoadWarning={resumed.loadWarning}
     />
   );
 
@@ -89,10 +100,12 @@ function AiTripCreatePage({
   trip,
   places,
   reservations,
+  initialLoadWarning = "",
 }: {
   trip?: TripResponse;
   places?: TripPlace[];
   reservations?: ReservationResponse;
+  initialLoadWarning?: string;
 }) {
   const [importing, setImporting] = useState(false);
   const {
@@ -204,6 +217,7 @@ function AiTripCreatePage({
       hideProgress={generating || importing}
       backDisabled={generating}
     >
+      {initialLoadWarning && <S.LoadWarning role="alert">{initialLoadWarning}</S.LoadWarning>}
       {content}
     </Layout>
   );
