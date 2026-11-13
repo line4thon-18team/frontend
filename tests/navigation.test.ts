@@ -4,7 +4,9 @@ import {
   isDirectTripMode,
   importedTripPath,
   readPlanOrigin,
+  savePendingInvite,
   settingsBackPath,
+  takePendingInvitePath,
   tripCommunityPath,
   tripPlanBackPath,
   tripPlanPath,
@@ -13,6 +15,18 @@ import {
 } from "../src/utils/navigation.ts";
 import { routes } from "../src/config/routes.ts";
 import { policyPath } from "../src/data/policyDocuments.ts";
+
+test("인증 완료 후 같은 초대장으로 한 번 복귀한다", () => {
+  const values = new Map<string, string>();
+  const storage = {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => { values.set(key, value); },
+    removeItem: (key: string) => { values.delete(key); },
+  };
+  savePendingInvite(storage, "invite-token");
+  assert.equal(takePendingInvitePath(storage), "/invite/invite-token");
+  assert.equal(takePendingInvitePath(storage), undefined);
+});
 
 test("일정 결과 경로에 진입 출처와 코스가 유지된다", () => {
   assert.equal(

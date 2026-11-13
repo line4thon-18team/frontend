@@ -3,6 +3,24 @@ import { routes } from "../config/routes.ts";
 export const demoInviteId = "osaka-demo";
 export const demoInvitePath = routes.invite.replace(":inviteId", demoInviteId);
 
+export function invitePath(token: string): string {
+  return routes.invite.replace(":inviteId", encodeURIComponent(token));
+}
+
+const pendingInviteKey = "dotlo:auth:pending-invite";
+
+type InviteStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+
+export function savePendingInvite(storage: InviteStorage, token: string) {
+  storage.setItem(pendingInviteKey, token);
+}
+
+export function takePendingInvitePath(storage: InviteStorage): string | undefined {
+  const token = storage.getItem(pendingInviteKey);
+  storage.removeItem(pendingInviteKey);
+  return token ? invitePath(token) : undefined;
+}
+
 export type PlanOrigin = "home" | "my-trips" | "courses" | "generated";
 
 const planOrigins: PlanOrigin[] = ["home", "my-trips", "courses", "generated"];

@@ -9,6 +9,7 @@ import { deleteTrip, getTrip } from "../api/trips";
 import type { MemberResponse, TripResponse } from "../api/types";
 import { apiTripToSummary } from "../utils/serverTrip";
 import CourseSettingsMenu from "../components/course-settings/CourseSettingsMenu";
+import ServerInviteSheet from "../components/course-settings/ServerInviteSheet";
 import CourseSettingsSheet from "../components/course-settings/CourseSettingsSheet";
 import { CourseSettingsConfirmDialog, CourseSettingsDetailView } from "../components/course-settings/CourseSettingsDetails";
 import useCourseSettings from "../hooks/useCourseSettings";
@@ -36,6 +37,7 @@ function ServerCourseSettings({ tripId }: { tripId: number }) {
   const [loadError, setLoadError] = useState("");
   const [attempt, setAttempt] = useState(0);
   const [showMembers, setShowMembers] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
   const [dialog, setDialog] = useState<"delete" | "leave">();
   const [actionError, setActionError] = useState("");
   const [pending, setPending] = useState(false);
@@ -90,7 +92,7 @@ function ServerCourseSettings({ tripId }: { tripId: number }) {
     <S.PageShell>
       <S.Page>
         {showMembers && data ? (
-          <CourseSettingsDetailView view="members" members={data.members} onBack={() => setShowMembers(false)} />
+          <CourseSettingsDetailView view="members" members={data.members} onBack={() => setShowMembers(false)} onInvite={() => setShowInvite(true)} />
         ) : (
           <>
             <S.Navigation aria-label="코스 설정 탐색">
@@ -120,6 +122,11 @@ function ServerCourseSettings({ tripId }: { tripId: number }) {
                   <S.SettingsSection aria-label="함께하기">
                     <h2>함께하기</h2>
                     <S.MenuList>
+                      <S.MenuButton type="button" onClick={() => setShowInvite(true)}>
+                        <img src={memberIcon} alt="" />
+                        <span>친구 초대</span>
+                        <S.Chevron src={chevronIcon} alt="" />
+                      </S.MenuButton>
                       <S.MenuButton type="button" onClick={() => setShowMembers(true)}>
                         <img src={memberIcon} alt="" />
                         <span>멤버 관리</span>
@@ -150,6 +157,7 @@ function ServerCourseSettings({ tripId }: { tripId: number }) {
             <S.HomeIndicator />
           </>
         )}
+        {showInvite && <ServerInviteSheet tripId={tripId} onClose={() => setShowInvite(false)} />}
         {dialog && <CourseSettingsConfirmDialog
           dialog={dialog}
           tripName={summary?.title}

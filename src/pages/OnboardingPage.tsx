@@ -23,6 +23,7 @@ import { routes } from "../config/routes";
 import { policyPath, type PolicyDocumentId } from "../data/policyDocuments";
 import { parseProfileSettings, PROFILE_STORAGE_KEY, saveProfileSettings, validateNickname, validateNicknameFormat } from "../utils/mySettings";
 import { allowDemoAuthentication } from "../utils/authNavigation";
+import { takePendingInvitePath } from "../utils/navigation";
 import * as S from "./OnboardingPage.styled";
 
 type AgreementKey = "service" | "privacy" | "age" | "location" | "marketing";
@@ -411,7 +412,7 @@ function OnboardingPage() {
         setError("브라우저에 데모 프로필을 저장하지 못했어요. 다시 시도해 주세요.");
         return;
       }
-      navigate(routes.home);
+      navigate(takePendingInvitePath(sessionStorage) ?? routes.home, { replace: true });
     };
     return (
       <S.CompleteScreen>
