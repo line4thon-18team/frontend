@@ -39,6 +39,8 @@ function OptionalInfoSheet({
 }: OptionalInfoSheetProps) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [searchingFlight, setSearchingFlight] = useState(false);
+  const [flightNotFound, setFlightNotFound] = useState(false);
   const [start, setStart] = useState(draft.startDate);
   const [end, setEnd] = useState(draft.endDate);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -125,6 +127,7 @@ function OptionalInfoSheet({
   }, [activePlaceQuery, draft.rental?.location, draft.tripId, isSearching, liveReservations, mode, rentalPlaceId]);
 
   async function findFlight() {
+    setFlightNotFound(false);
     if (!validDate(start) || !validDate(end) || end < start) {
       setError("여행 날짜를 다시 선택해 주세요.");
       return;
@@ -137,14 +140,17 @@ function OptionalInfoSheet({
     }
     const date = flightTab === "outbound" ? start : end;
     if (isApiEnabled() && hasAuthSession()) {
-      setSaving(true);
+      setSearchingFlight(true);
       try {
         const results = await searchFlights(code, date);
-        const result = results[0];
-        if (!result) {
-          setError("항공편을 찾지 못했어요. 편명과 날짜를 확인해 주세요.");
+        if (!Array.isArray(results)) {
+          throw new Error("항공편 조회 응답을 확인하지 못했어요. 다시 시도해 주세요.");
+        }
+        if (results.length === 0) {
+          setFlightNotFound(true);
           return;
         }
+        const result = results[0];
         setFlight({
           code: result.number,
           airline: result.airline ?? result.number,
@@ -156,18 +162,12 @@ function OptionalInfoSheet({
           apiFlight: result,
         });
         return;
-      } catch (reason) {
-        if (!shouldUseMockFallback(reason)) {
-          setError(
-            reason instanceof Error
-              ? reason.message
-              : "항공편을 찾지 못했어요. 다시 시도해 주세요.",
-          );
-          return;
-        }
+      } catch {
+        setError("항공편을 조회하지 못했어요. 다시 시도해 주세요.");
       } finally {
-        setSaving(false);
+        setSearchingFlight(false);
       }
+      return;
     }
     const match = mockFlights.find(
       (item) =>
@@ -177,7 +177,7 @@ function OptionalInfoSheet({
           : item.to.includes("인천")),
     );
     if (!match || !["오사카", "교토"].includes(draft.city)) {
-      setError("항공편을 찾지 못했어요. 편명을 다시 확인해 주세요.");
+      setFlightNotFound(true);
       return;
     }
     setFlight({ ...match, date: flightTab === "outbound" ? start : end });
@@ -460,6 +460,8 @@ function OptionalInfoSheet({
             disabled={!validDate(start) || !validDate(end) || end < start}
             onClick={() => {
               setFlight(null);
+              setError("");
+              setFlightNotFound(false);
               setShowCalendar(false);
             }}
           >
@@ -489,7 +491,7 @@ function OptionalInfoSheet({
             type="button"
             onClick={() => void (mode === "flight" && !flight ? findFlight() : save())}
             disabled={
-              saving ||
+              saving || searchingFlight ||
               (mode === "flight"
                 ? !flight && !flightCode.trim()
                 : mode === "stay"
@@ -497,7 +499,9 @@ function OptionalInfoSheet({
                   : !carDays.length || !location.trim())
             }
           >
-            {saving
+            {searchingFlight
+              ? "항공편을 찾고 있어요"
+              : saving
               ? "처리하고 있어요"
               : mode === "flight"
               ? flight
@@ -519,11 +523,13 @@ function OptionalInfoSheet({
                 key={tab}
                 type="button"
                 aria-pressed={flightTab === tab}
+                disabled={searchingFlight || saving}
                 onClick={() => {
                   setFlightTab(tab);
                   setFlightCode(draft[tab]?.code ?? "");
                   setFlight(draft[tab]);
                   setError("");
+                  setFlightNotFound(false);
                 }}
               >
                 {tab === "outbound" ? "가는 편" : "오는 편"}
@@ -539,15 +545,18 @@ function OptionalInfoSheet({
                 placeholder="예) KE723, 7C1301"
                 maxLength={8}
                 value={flightCode}
+                readOnly={searchingFlight || saving}
                 onChange={(event) => {
                   setFlightCode(event.target.value.toUpperCase());
                   setFlight(null);
                   setError("");
+                  setFlightNotFound(false);
                 }}
               />
             </label>
             <S.Chip
               type="button"
+              disabled={searchingFlight || saving}
               onClick={() => {
                 calendarSnapshot.current = { start, end };
                 setShowCalendar(true);
@@ -571,8 +580,14 @@ function OptionalInfoSheet({
                 </div>
               </S.FlightTimes>
             </S.FlightResult>
-          ) : (
-            <S.Help>편명만 입력하면 시간을 자동으로 찾아요</S.Help>
+          ) : !error && (
+            <S.Help role="status">
+              {searchingFlight
+                ? "항공편을 조회하고 있어요."
+                : flightNotFound
+                  ? "조건에 맞는 항공편이 없어요. 편명과 날짜를 확인해 주세요."
+                  : "편명만 입력하면 시간을 자동으로 찾아요"}
+            </S.Help>
           )}
         </>
       )}
