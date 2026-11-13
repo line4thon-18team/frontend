@@ -39,6 +39,8 @@ function OptionalInfoSheet({
 }: OptionalInfoSheetProps) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [searchingFlight, setSearchingFlight] = useState(false);
+  const [flightNotFound, setFlightNotFound] = useState(false);
   const [start, setStart] = useState(draft.startDate);
   const [end, setEnd] = useState(draft.endDate);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -69,6 +71,9 @@ function OptionalInfoSheet({
   const [rentalPlaceId, setRentalPlaceId] = useState(draft.rental?.placeId);
   const [remotePlaces, setRemotePlaces] = useState<PlaceCandidate[]>();
   const [searchError, setSearchError] = useState("");
+  const [staySearch, setStaySearch] = useState<
+    { query: string; results: PlaceCandidate[] } | { query: string; error: string }
+  >();
   const timelineRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{ id: string; edge: "start" | "end" } | null>(null);
   const dates = rangeDates(draft.startDate, draft.endDate);
@@ -88,30 +93,45 @@ function OptionalInfoSheet({
   });
   const liveReservations =
     isApiEnabled() && hasAuthSession() && isServerTripId(draft.tripId);
+  const demoStaySearch = !isApiEnabled();
+  const settledStaySearch = staySearch?.query === hotelQuery.trim() ? staySearch : undefined;
   const activePlaceQuery = mode === "stay" ? hotelQuery : location;
   const hotels = liveReservations
-    ? (remotePlaces ?? []).map((place) => ({ ...place, city: draft.city }))
-    : mockHotels.filter(
+    ? (settledStaySearch && "results" in settledStaySearch ? settledStaySearch.results : [])
+        .map((place) => ({ ...place, city: draft.city }))
+    : demoStaySearch ? mockHotels.filter(
         (hotel) =>
           hotel.name.toLowerCase().includes(hotelQuery.trim().toLowerCase()) ||
           hotel.address.includes(hotelQuery.trim()),
-      );
+      ) : [];
 
   useEffect(() => {
     const query = activePlaceQuery.trim();
-    if (!liveReservations || (mode === "stay" && !isSearching) || query.length < 2) {
+    if (!liveReservations || mode === "flight" ||
+      (mode === "stay" ? !isSearching || !query : query.length < 2)) {
       return;
     }
     if (mode === "car" && rentalPlaceId) return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
-      setSearchError("");
+      if (mode === "car") setSearchError("");
       void searchPlaces(Number(draft.tripId), query, controller.signal).then(
         (results) => {
-          if (!controller.signal.aborted) setRemotePlaces(results);
+          if (controller.signal.aborted) return;
+          if (mode === "stay") {
+            setStaySearch(Array.isArray(results)
+              ? { query, results }
+              : { query, error: "숙소를 검색하지 못했어요. 다시 시도해 주세요." });
+          } else {
+            setRemotePlaces(results);
+          }
         },
         (reason: unknown) => {
           if (!controller.signal.aborted) {
+            if (mode === "stay") {
+              setStaySearch({ query, error: "숙소를 검색하지 못했어요. 다시 시도해 주세요." });
+              return;
+            }
             setRemotePlaces([]);
             setSearchError(reason instanceof Error ? reason.message : "장소를 검색하지 못했어요.");
           }
@@ -125,6 +145,7 @@ function OptionalInfoSheet({
   }, [activePlaceQuery, draft.rental?.location, draft.tripId, isSearching, liveReservations, mode, rentalPlaceId]);
 
   async function findFlight() {
+    setFlightNotFound(false);
     if (!validDate(start) || !validDate(end) || end < start) {
       setError("여행 날짜를 다시 선택해 주세요.");
       return;
@@ -137,14 +158,17 @@ function OptionalInfoSheet({
     }
     const date = flightTab === "outbound" ? start : end;
     if (isApiEnabled() && hasAuthSession()) {
-      setSaving(true);
+      setSearchingFlight(true);
       try {
         const results = await searchFlights(code, date);
-        const result = results[0];
-        if (!result) {
-          setError("항공편을 찾지 못했어요. 편명과 날짜를 확인해 주세요.");
+        if (!Array.isArray(results)) {
+          throw new Error("항공편 조회 응답을 확인하지 못했어요. 다시 시도해 주세요.");
+        }
+        if (results.length === 0) {
+          setFlightNotFound(true);
           return;
         }
+        const result = results[0];
         setFlight({
           code: result.number,
           airline: result.airline ?? result.number,
@@ -156,18 +180,12 @@ function OptionalInfoSheet({
           apiFlight: result,
         });
         return;
-      } catch (reason) {
-        if (!shouldUseMockFallback(reason)) {
-          setError(
-            reason instanceof Error
-              ? reason.message
-              : "항공편을 찾지 못했어요. 다시 시도해 주세요.",
-          );
-          return;
-        }
+      } catch {
+        setError("항공편을 조회하지 못했어요. 다시 시도해 주세요.");
       } finally {
-        setSaving(false);
+        setSearchingFlight(false);
       }
+      return;
     }
     const match = mockFlights.find(
       (item) =>
@@ -177,7 +195,7 @@ function OptionalInfoSheet({
           : item.to.includes("인천")),
     );
     if (!match || !["오사카", "교토"].includes(draft.city)) {
-      setError("항공편을 찾지 못했어요. 편명을 다시 확인해 주세요.");
+      setFlightNotFound(true);
       return;
     }
     setFlight({ ...match, date: flightTab === "outbound" ? start : end });
@@ -460,6 +478,8 @@ function OptionalInfoSheet({
             disabled={!validDate(start) || !validDate(end) || end < start}
             onClick={() => {
               setFlight(null);
+              setError("");
+              setFlightNotFound(false);
               setShowCalendar(false);
             }}
           >
@@ -489,7 +509,7 @@ function OptionalInfoSheet({
             type="button"
             onClick={() => void (mode === "flight" && !flight ? findFlight() : save())}
             disabled={
-              saving ||
+              saving || searchingFlight ||
               (mode === "flight"
                 ? !flight && !flightCode.trim()
                 : mode === "stay"
@@ -497,7 +517,9 @@ function OptionalInfoSheet({
                   : !carDays.length || !location.trim())
             }
           >
-            {saving
+            {searchingFlight
+              ? "항공편을 찾고 있어요"
+              : saving
               ? "처리하고 있어요"
               : mode === "flight"
               ? flight
@@ -519,11 +541,13 @@ function OptionalInfoSheet({
                 key={tab}
                 type="button"
                 aria-pressed={flightTab === tab}
+                disabled={searchingFlight || saving}
                 onClick={() => {
                   setFlightTab(tab);
                   setFlightCode(draft[tab]?.code ?? "");
                   setFlight(draft[tab]);
                   setError("");
+                  setFlightNotFound(false);
                 }}
               >
                 {tab === "outbound" ? "가는 편" : "오는 편"}
@@ -539,15 +563,18 @@ function OptionalInfoSheet({
                 placeholder="예) KE723, 7C1301"
                 maxLength={8}
                 value={flightCode}
+                readOnly={searchingFlight || saving}
                 onChange={(event) => {
                   setFlightCode(event.target.value.toUpperCase());
                   setFlight(null);
                   setError("");
+                  setFlightNotFound(false);
                 }}
               />
             </label>
             <S.Chip
               type="button"
+              disabled={searchingFlight || saving}
               onClick={() => {
                 calendarSnapshot.current = { start, end };
                 setShowCalendar(true);
@@ -571,8 +598,14 @@ function OptionalInfoSheet({
                 </div>
               </S.FlightTimes>
             </S.FlightResult>
-          ) : (
-            <S.Help>편명만 입력하면 시간을 자동으로 찾아요</S.Help>
+          ) : !error && (
+            <S.Help role="status">
+              {searchingFlight
+                ? "항공편을 조회하고 있어요."
+                : flightNotFound
+                  ? "조건에 맞는 항공편이 없어요. 편명과 날짜를 확인해 주세요."
+                  : "편명만 입력하면 시간을 자동으로 찾아요"}
+            </S.Help>
           )}
         </>
       )}
@@ -611,6 +644,7 @@ function OptionalInfoSheet({
                               setActiveStayId(stay.id);
                               setEditingId(stay.id);
                               setHotelQuery(stay.name);
+                              setStaySearch(undefined);
                               setIsSearching(true);
                             }}
                           >
@@ -632,6 +666,7 @@ function OptionalInfoSheet({
                         onClick={() => {
                           setEditingId(null);
                           setHotelQuery("");
+                          setStaySearch(undefined);
                           setIsSearching(true);
                         }}
                       >
@@ -662,7 +697,7 @@ function OptionalInfoSheet({
                   onChange={(event) => {
                     setHotelQuery(event.target.value);
                     setPendingHotel(null);
-                    setRemotePlaces(undefined);
+                    if (event.target.value.trim() !== hotelQuery.trim()) setStaySearch(undefined);
                   }}
                 />
               </S.Search>
@@ -678,9 +713,19 @@ function OptionalInfoSheet({
                   </button>
                 ))}
               </S.Results>
-              {hotelQuery.trim() && !hotels.length && (
+              {!liveReservations && !demoStaySearch && (
+                <S.Help role="status">저장된 여행에서 숙소를 검색할 수 있어요.</S.Help>
+              )}
+              {liveReservations && hotelQuery.trim() && !settledStaySearch && (
+                <S.Help role="status">숙소를 검색하고 있어요.</S.Help>
+              )}
+              {settledStaySearch && "error" in settledStaySearch && (
+                <S.ErrorText role="alert">{settledStaySearch.error}</S.ErrorText>
+              )}
+              {hotelQuery.trim() && !hotels.length &&
+                (demoStaySearch || (settledStaySearch && "results" in settledStaySearch)) && (
                 <>
-                  <S.Help>
+                  <S.Help role="status">
                     {liveReservations
                       ? "숙소 검색 결과가 없어요. 다른 이름으로 검색해 주세요."
                       : "숙소 검색 결과가 없어요. 주소를 직접 입력해 주세요."}
@@ -705,7 +750,6 @@ function OptionalInfoSheet({
                   </S.Chip>}
                 </>
               )}
-              {searchError && <S.ErrorText role="alert">{searchError}</S.ErrorText>}
               {pendingHotel && (
                 <>
                   <S.ErrorText role="alert">

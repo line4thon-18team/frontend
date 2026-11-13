@@ -39,15 +39,17 @@ export function importedTripPath(tripId: string): string {
   return `/my-trips/${encodeURIComponent(tripId)}`;
 }
 
-export function tripSettingsPath(origin: PlanOrigin, courseId?: string): string {
+export function tripSettingsPath(origin: PlanOrigin, courseId?: string, returnTripId?: number): string {
   const params = new URLSearchParams({ from: origin });
   if (courseId) params.set("course", courseId);
+  if (returnTripId !== undefined) params.set("returnTripId", String(returnTripId));
   return `${routes.tripSettings}?${params.toString()}`;
 }
 
-export function tripCommunityPath(origin: PlanOrigin, courseId?: string): string {
+export function tripCommunityPath(origin: PlanOrigin, courseId?: string, returnTripId?: number): string {
   const params = new URLSearchParams({ from: origin });
   if (courseId) params.set("course", courseId);
+  if (returnTripId !== undefined) params.set("returnTripId", String(returnTripId));
   return `${routes.tripCommunity}?${params.toString()}`;
 }
 
@@ -60,6 +62,10 @@ export function tripPlanBackPath(search: string): string {
 
 export function settingsBackPath(search: string): string {
   const params = new URLSearchParams(search);
+  const returnTripId = params.get("returnTripId");
+  if (returnTripId && /^\d+$/.test(returnTripId)) {
+    return serverTripPlanPath(readPlanOrigin(search), returnTripId);
+  }
   return tripPlanPath(readPlanOrigin(search), params.get("course") ?? undefined);
 }
 

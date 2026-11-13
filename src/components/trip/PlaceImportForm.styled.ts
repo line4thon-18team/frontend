@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 export const Flow = styled.section`
   display: flex; min-height: 100%; flex: 1; flex-direction: column; gap: 20px; color: #1a1a1a;
+  min-width: 0;
 `;
 
 export const Heading = styled.header`
@@ -107,10 +108,16 @@ export const ErrorBox = styled.div`
 
 export const FormFooter = styled.div`
   display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 12px;
+  flex-shrink: 0;
 `;
 
 export const PrimaryButton = styled.button`
   width: 100%; min-height: 54px; border-radius: 14px; background: #090738; color: #fff; font-size: 15px; font-weight: 700;
+  padding: 12px 16px;
+  line-height: 1.5;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
   &:disabled { background: #ececf1; color: #a8a8ae; cursor: default; }
 `;
 

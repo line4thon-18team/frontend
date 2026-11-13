@@ -137,7 +137,7 @@ function NotificationSettingsPage() {
                 <small>{item.description}</small>
               </S.SettingText>
               <Toggle
-                checked={settings[item.key]}
+                checked={settings.allNotifications && settings[item.key]}
                 disabled={!settings.allNotifications}
                 label={item.label}
                 onClick={() => toggleSetting(item.key)}

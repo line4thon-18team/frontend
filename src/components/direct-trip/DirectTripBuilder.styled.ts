@@ -16,7 +16,7 @@ export const Shell = styled.div`
   background: #ffffff;
   font-family: "Noto Sans KR", Arial, sans-serif;
 
-  :where(button) {
+  :where(&) :where(button) {
     margin: 0;
     padding: 0;
     border: 0;
@@ -259,35 +259,25 @@ export const HeroScrim = styled.div`
 export const HeroHeader = styled.header`
   position: absolute;
   z-index: 5;
+  top: env(safe-area-inset-top, 0px);
   right: 0;
-  bottom: 0;
   left: 0;
   display: grid;
-  grid-template-columns: 44px 1fr 44px;
-  align-items: end;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
   gap: 6px;
-  padding: 0 14px 22px;
+  padding: 4px 14px;
   color: #ffffff;
 
-  > div {
-    min-width: 0;
+  > ${BackButton} {
+    width: 44px;
+    height: 44px;
+    background: rgb(5 5 31 / 45%);
   }
 
   small {
-    display: block;
-    margin-bottom: 3px;
-    font-size: 11px;
-  }
-
-  h1 {
-    margin: 0;
-    font-size: 22px;
-    line-height: 30px;
-  }
-
-  p {
-    margin: 3px 0 0;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 700;
   }
 
   > button:last-child {
@@ -303,6 +293,25 @@ export const HeroHeader = styled.header`
   > button:last-child img {
     width: 20px;
     filter: brightness(0) invert(1);
+  }
+`;
+
+export const HeroTitle = styled.div`
+  position: absolute;
+  right: 20px;
+  bottom: 22px;
+  left: 20px;
+  color: #ffffff;
+
+  h1 {
+    margin: 0;
+    font-size: 22px;
+    line-height: 30px;
+  }
+
+  p {
+    margin: 3px 0 0;
+    font-size: 12px;
   }
 `;
 

@@ -179,6 +179,12 @@ export const MatchButton = styled.button`
   text-align: left;
   cursor: pointer;
 `;
+export const PlaceSearchButton = styled(MatchButton)`
+  width: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+`;
+
 export const Checkbox = styled.input`
   appearance: none;
   width: 20px;
