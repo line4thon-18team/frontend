@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import { loginWithGoogleCode, validateOAuthState } from "../api/auth";
 import { routes } from "../config/routes";
 import { shouldCompleteSignup } from "../utils/authFlow";
+import { takePendingInvitePath } from "../utils/navigation";
 
 function AuthCallbackPage() {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ function AuthCallbackPage() {
           navigate(
             shouldCompleteSignup(response.signupCompleted)
               ? routes.onboardingTerms
-              : routes.home,
+              : takePendingInvitePath(sessionStorage) ?? routes.home,
             { replace: true },
           );
         }

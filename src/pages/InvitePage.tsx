@@ -13,7 +13,7 @@ import thumbThree from "../assets/invite/thumb-3.png";
 import thumbFour from "../assets/invite/thumb-4.png";
 import ticketShape from "../assets/invite/ticket-shape.svg";
 import { routes } from "../config/routes";
-import { demoInviteId, serverTripPlanPath, tripCommunityPath } from "../utils/navigation";
+import { demoInviteId, savePendingInvite, serverTripPlanPath, tripCommunityPath } from "../utils/navigation";
 import { acceptInvite, getInvitePreview } from "../api/members";
 import { ApiError } from "../api/client";
 import { hasAuthSession } from "../api/tokenStorage";
@@ -27,21 +27,35 @@ const companionLabels = {
   FAMILY: "가족",
 } as const;
 
+function inviteError(reason: unknown, fallback: string) {
+  if (reason instanceof ApiError) {
+    if (reason.code === "INVITE_EXPIRED") return "초대가 만료됐어요. 초대한 친구에게 새 링크를 받아 주세요.";
+    if (reason.code === "INVITE_NOT_FOUND") return "초대 링크를 찾을 수 없어요.";
+    if (reason.code === "TRIP_MEMBER_FULL") return "여행 인원이 가득 찼어요.";
+  }
+  return fallback;
+}
+
 function shortDate(value: string) {
   const [, month, day] = value.split("-");
   return `${Number(month)}.${Number(day)}`;
 }
 
 function InvitePage() {
+  const { inviteId } = useParams();
+  return <InviteDetails key={inviteId} inviteId={inviteId} />;
+}
+
+function InviteDetails({ inviteId }: { inviteId?: string }) {
   const location = useLocation();
   const navigate = useNavigate();
   const inviteState = new URLSearchParams(location.search).get("state");
-  const { inviteId } = useParams();
   const demo = inviteId === demoInviteId;
   const [preview, setPreview] = useState<InvitePreviewResponse>();
   const [loading, setLoading] = useState(!demo);
   const [accepting, setAccepting] = useState(false);
   const [error, setError] = useState(inviteState === "expired" ? "초대가 만료됐어요." : "");
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (!inviteId || demo) return;
@@ -55,16 +69,12 @@ function InvitePage() {
       },
       (reason) => {
         if (controller.signal.aborted) return;
-        setError(
-          reason instanceof ApiError && reason.code === "INVITE_EXPIRED"
-            ? "초대가 만료됐어요. 초대한 친구에게 새 링크를 받아 주세요."
-            : "초대 링크를 찾을 수 없어요.",
-        );
+        setError(inviteError(reason, "초대 정보를 불러오지 못했어요. 다시 시도해 주세요."));
         setLoading(false);
       },
     );
     return () => controller.abort();
-  }, [demo, inviteId]);
+  }, [demo, inviteId, attempt]);
 
   const joinTrip = async () => {
     if (!inviteId || demo) {
@@ -72,16 +82,24 @@ function InvitePage() {
       return;
     }
     if (!hasAuthSession()) {
-      setError("로그인한 뒤 초대를 수락해 주세요.");
+      try {
+        savePendingInvite(sessionStorage, inviteId);
+        navigate(routes.login);
+      } catch {
+        setError("초대 정보를 보관하지 못했어요. 다시 시도해 주세요.");
+      }
       return;
     }
     setAccepting(true);
     setError("");
     try {
       const result = await acceptInvite(inviteId);
-      navigate(serverTripPlanPath("home", String(result.tripId)), { replace: true });
+      navigate(serverTripPlanPath("my-trips", String(result.tripId)), {
+        replace: true,
+        state: { inviteAccepted: true },
+      });
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "초대를 수락하지 못했어요.");
+      setError(inviteError(reason, "초대를 수락하지 못했어요. 다시 시도해 주세요."));
       setAccepting(false);
     }
   };
@@ -91,6 +109,20 @@ function InvitePage() {
       <S.Page>
         <S.Actions>
           <p role="status">초대 정보를 불러오고 있어요.</p>
+        </S.Actions>
+      </S.Page>
+    );
+  }
+
+  if (!demo && !preview) {
+    return (
+      <S.Page>
+        <S.Actions>
+          <S.DisabledNotice role="alert">{error}</S.DisabledNotice>
+          <button type="button" onClick={() => {
+            setLoading(true);
+            setAttempt((value) => value + 1);
+          }}>다시 시도</button>
         </S.Actions>
       </S.Page>
     );
@@ -143,24 +175,12 @@ function InvitePage() {
       </S.Ticket>
 
       <S.Actions>
-        {error ? (
-          <>
-            <S.DisabledNotice role="alert">{error}</S.DisabledNotice>
-            {!hasAuthSession() && !demo ? (
-              <button type="button" onClick={() => navigate(routes.login)}>로그인하기</button>
-            ) : (
-              <button type="button" onClick={() => navigate(routes.home)}>홈으로 가기</button>
-            )}
-          </>
-        ) : (
-          <>
-            {demo && <S.DemoNotice>공유 링크에는 샘플 여행만 표시돼요.</S.DemoNotice>}
-            <button type="button" disabled={accepting} onClick={() => void joinTrip()}>
-              {accepting ? "참여하고 있어요" : demo ? "공동 계획 데모 보기" : "초대 수락하기"}
-            </button>
-            <S.LaterButton type="button" onClick={() => navigate(routes.home)}>나중에 볼게요</S.LaterButton>
-          </>
-        )}
+        {error && <S.DisabledNotice role="alert">{error}</S.DisabledNotice>}
+        {demo && <S.DemoNotice>공유 링크에는 샘플 여행만 표시돼요.</S.DemoNotice>}
+        <button type="button" disabled={accepting} onClick={() => void joinTrip()}>
+          {accepting ? "참여하고 있어요" : demo ? "공동 계획 데모 보기" : "초대 수락하기"}
+        </button>
+        <S.LaterButton type="button" onClick={() => navigate(routes.home)}>나중에 볼게요</S.LaterButton>
         <S.HomeIndicator />
       </S.Actions>
     </S.Page>

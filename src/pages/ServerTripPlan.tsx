@@ -58,6 +58,7 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
   const [editPending, setEditPending] = useState(false);
   const [actionError, setActionError] = useState("");
   const [notice, setNotice] = useState("");
+  const [inviteAccepted, setInviteAccepted] = useState(state?.inviteAccepted === true);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -200,6 +201,13 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
           {error && <p role="alert">{error}</p>}
           {actionError && <p role="alert">{actionError}</p>}
           {notice && <p role="status">{notice}</p>}
+          {inviteAccepted && summary && (
+            <div className="course-toast course-toast--invite" role="status">
+              <span aria-hidden="true">✓</span>
+              <p>{summary.title} 여행에 참여했어요.</p>
+              <button type="button" onClick={() => setInviteAccepted(false)}>닫기</button>
+            </div>
+          )}
           {!data && !error && <p role="status">여행 일정을 불러오고 있어요.</p>}
           {data && summary && (
             <section className="course-section">
