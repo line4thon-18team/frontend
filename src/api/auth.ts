@@ -109,6 +109,28 @@ export function getMyStats(signal?: AbortSignal) {
   return apiRequest<MyStatsResponse>("/api/users/me/stats", { signal });
 }
 
+interface WithdrawalTrip {
+  tripId: number;
+  city: string;
+  startDate: string;
+  endDate: string;
+  newOwnerName: string | null;
+}
+
+export interface WithdrawalPreview {
+  deletedTrips: WithdrawalTrip[];
+  transferredTrips: WithdrawalTrip[];
+  leftTrips: WithdrawalTrip[];
+}
+
+export function getWithdrawalPreview(signal?: AbortSignal) {
+  return apiRequest<WithdrawalPreview>("/api/users/me/withdrawal", { signal });
+}
+
+export function withdrawAccount() {
+  return apiRequest<void>("/api/users/me", { method: "DELETE", retryAuth: false });
+}
+
 export async function completeSignup(input: SignupInput, signal?: AbortSignal) {
   await apiRequest<void>("/api/users/me/signup", {
     method: "POST",

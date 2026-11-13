@@ -139,6 +139,12 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: routes.withdrawalComplete,
+        lazy: async () => ({
+          Component: (await import("../pages/WithdrawalPage")).WithdrawalCompletePage,
+        }),
+      },
+      {
         path: routes.notices,
         lazy: async () => ({
           Component: (await import("../pages/SupportPage")).default,

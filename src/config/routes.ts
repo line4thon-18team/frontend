@@ -19,6 +19,7 @@ export const routes = {
   privacyPolicy: "/terms/privacy",
   googleMapsSettings: "/my/account/google-maps",
   withdrawal: "/my/account/withdrawal",
+  withdrawalComplete: "/my/account/withdrawal/complete",
   notices: "/my/support/notices",
   faq: "/my/support/faq",
   feedback: "/my/support/feedback",

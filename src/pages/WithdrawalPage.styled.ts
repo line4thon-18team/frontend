@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Page = styled.div`
   width: 100%; max-width: 402px; min-height: 100dvh; margin: 0 auto; color: #1a1a1a; background: #ffffff; font-family: "Noto Sans KR", Arial, sans-serif;
   button, textarea { font: inherit; }
-  button { padding: 0; border: 0; color: inherit; background: transparent; cursor: pointer; }
+  :where(&) :where(button) { padding: 0; border: 0; color: inherit; background: transparent; cursor: pointer; }
 `;
 export const Header = styled.header`
   height: 54px; display: flex; align-items: center; gap: 14px; padding: 0 20px;
@@ -14,6 +14,12 @@ export const Header = styled.header`
 const bodyBase = `padding: 20px 20px 140px; h2 { margin: 0; font-size: 24px; line-height: 32px; letter-spacing: -0.24px; } > p { margin: 8px 0 0; color: #5c5c63; font-size: 14px; line-height: 20px; }`;
 export const NoticeBody = styled.main`${bodyBase}`;
 export const ReasonBody = styled.main`${bodyBase}`;
+export const Retry = styled.button`
+  margin-top: 12px;
+  min-height: 44px;
+  color: #090738;
+  text-decoration: underline;
+`;
 export const LostList = styled.ul`
   display: flex; flex-direction: column; gap: 8px; margin: 28px 0 34px; padding: 0; list-style: none;
   li { min-height: 56px; display: flex; align-items: center; gap: 14px; }
@@ -27,7 +33,7 @@ export const Footnote = styled.p`
   color: #8a8a8e !important; font-size: 12px !important; line-height: 17px !important;
 `;
 export const Agree = styled.div`
-  position: fixed; right: 20px; bottom: 104px; left: 20px; width: min(calc(100% - 40px), 362px); margin: auto; display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 10px; margin-top: 24px;
   button { width: 22px; height: 22px; display: grid; place-items: center; border: 1.5px solid #e4e6ec; border-radius: 6px; color: #ffffff; font-weight: 700; }
   button[aria-checked="true"] { border-color: #090738; background: #090738; }
   span { font-size: 14px; line-height: 20px; }
@@ -59,6 +65,7 @@ export const Dialog = styled.div`
   > div { display: flex; gap: 8px; }
   button { min-height: 52px; flex: 1; border-radius: 14px; background: #f3f5fa; font-weight: 700; }
   button[data-danger] { color: #ffffff; background: #e5484d; }
+  button:disabled { opacity: 0.65; cursor: default; }
 `;
 export const Done = styled.main`
   display: flex; flex-direction: column; align-items: center; padding: 170px 20px 130px; text-align: center;
