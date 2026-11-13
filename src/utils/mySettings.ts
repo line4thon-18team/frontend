@@ -183,6 +183,7 @@ export function saveNotificationSettings(
 }
 
 export function countEnabledNotifications(settings: NotificationSettings) {
+  if (!settings.allNotifications) return 0;
   return Object.values(settings).filter(Boolean).length;
 }
 

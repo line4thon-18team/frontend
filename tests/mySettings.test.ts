@@ -38,6 +38,19 @@ test("알림 설정은 피그마 기본 상태와 활성 개수를 유지한다"
   assert.equal(parseNotificationSettings('{"allNotifications":true}'), null);
 });
 
+test("전체 알림을 끄면 활성 개수가 0이 되고 다시 켜면 이전 개수로 돌아간다", () => {
+  const settings = { ...defaultNotificationSettings, tripReminder: false, voteResults: true };
+  const disabledSettings = { ...settings, allNotifications: false };
+  const savedSettings = parseNotificationSettings(JSON.stringify(disabledSettings));
+
+  assert.deepEqual(savedSettings, disabledSettings);
+  assert.equal(countEnabledNotifications(disabledSettings), 0);
+
+  const restoredSettings = { ...disabledSettings, allNotifications: true };
+  assert.deepEqual(restoredSettings, settings);
+  assert.equal(countEnabledNotifications(restoredSettings), 5);
+});
+
 test("저장된 프로필 데이터는 올바른 형식일 때만 복원한다", () => {
   const profile = JSON.stringify({
     nickname: "서희",
