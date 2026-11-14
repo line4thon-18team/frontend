@@ -47,6 +47,12 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: routes.sharedTrip,
+        lazy: async () => ({
+          Component: (await import("../pages/SharedTripPage")).default,
+        }),
+      },
+      {
         path: routes.invite,
         lazy: async () => ({
           Component: (await import("../pages/InvitePage")).default,

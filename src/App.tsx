@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, Outlet, ScrollRestoration, useLocation } from "react-router";
+import { Navigate, Outlet, ScrollRestoration, useLocation, useMatch } from "react-router";
 import { getMe, SIGNUP_COMPLETED_EVENT } from "./api/auth";
 import { apiMode } from "./api/config";
 import { hasAuthSession } from "./api/tokenStorage";
@@ -22,6 +22,7 @@ function App() {
   );
   const demoAuthentication = allowDemoAuthentication(import.meta.env.DEV, apiMode);
   const loginRedirect = authRedirectPath(location.pathname, demoAuthentication);
+  const sharedTripRoute = Boolean(useMatch(routes.sharedTrip));
   const signupFlowRoute =
     isOnboardingRoute(location.pathname) ||
     location.pathname === routes.googleAuthCallback ||
@@ -55,7 +56,7 @@ function App() {
     return <Navigate to={loginRedirect} replace />;
   }
 
-  if (hasSession && !signupFlowRoute) {
+  if (hasSession && !signupFlowRoute && !sharedTripRoute) {
     if (signupStatus === "idle" || signupStatus === "checking") {
       return <main role="status">가입 정보를 확인하고 있어요…</main>;
     }

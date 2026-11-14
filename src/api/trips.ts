@@ -4,7 +4,23 @@ import type {
   TripInput,
   TripResponse,
   TripUpdateInput,
+  ItineraryVersionView,
+  SavedPlaceResponse,
 } from "./types";
+
+export interface SharedTrip {
+  trip: Pick<TripResponse, "city" | "startDate" | "endDate" | "companion" | "companionCount">;
+  itinerary: Pick<ItineraryVersionView, "version" | "draft" | "validation">;
+  places: Pick<SavedPlaceResponse, "placeId" | "name" | "address">[];
+}
+
+export function createTripShare(tripId: number, signal?: AbortSignal) {
+  return apiRequest<{ token: string }>(`/api/trips/${tripId}/share`, { method: "POST", signal });
+}
+
+export function getSharedTrip(token: string, signal?: AbortSignal) {
+  return apiRequest<SharedTrip>(`/api/share/${encodeURIComponent(token)}`, { auth: false, signal });
+}
 
 export function getCities(signal?: AbortSignal) {
   return apiRequest<CityResponse[]>("/api/cities", { auth: false, signal });

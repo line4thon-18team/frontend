@@ -274,3 +274,6 @@ export function readDraft(value: string | null): TripDraft {
     return emptyDraft();
   }
 }
+export function timeLabel(value: string) {
+  return (value.split("T")[1] ?? value).slice(0, 5);
+}

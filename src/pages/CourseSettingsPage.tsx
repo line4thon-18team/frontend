@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router";
 import backIcon from "../assets/course-settings/back.svg";
+import shareIcon from "../assets/course-settings/link.svg";
 import memberIcon from "../assets/course-settings-details/menu-members.svg";
 import deleteIcon from "../assets/course-settings-details/menu-delete.svg";
 import chevronIcon from "../assets/figma/settings-chevron.svg";
@@ -38,6 +39,7 @@ function ServerCourseSettings({ tripId }: { tripId: number }) {
   const [attempt, setAttempt] = useState(0);
   const [showMembers, setShowMembers] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [dialog, setDialog] = useState<"delete" | "leave">();
   const [actionError, setActionError] = useState("");
   const [pending, setPending] = useState(false);
@@ -133,6 +135,13 @@ function ServerCourseSettings({ tripId }: { tripId: number }) {
                         <S.MenuMeta>{data.members.length}명</S.MenuMeta>
                         <S.Chevron src={chevronIcon} alt="" />
                       </S.MenuButton>
+                      {data.trip.status === "CONFIRMED" && (
+                        <S.MenuButton type="button" onClick={() => setShowShare(true)}>
+                          <img src={shareIcon} alt="" />
+                          <span>일정 공유</span>
+                          <S.Chevron src={chevronIcon} alt="" />
+                        </S.MenuButton>
+                      )}
                     </S.MenuList>
                   </S.SettingsSection>
                   {currentMember && <>
@@ -158,6 +167,7 @@ function ServerCourseSettings({ tripId }: { tripId: number }) {
           </>
         )}
         {showInvite && <ServerInviteSheet tripId={tripId} onClose={() => setShowInvite(false)} />}
+        {showShare && <ServerInviteSheet tripId={tripId} onClose={() => setShowShare(false)} publicShare />}
         {dialog && <CourseSettingsConfirmDialog
           dialog={dialog}
           tripName={summary?.title}
