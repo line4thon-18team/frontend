@@ -5,7 +5,7 @@ import type { Companion, TripDraft } from "../types/trip";
 import { formatTripDateRange } from "./importedTrip";
 import { dateKey, dayCount, durationLabel, emptyDraft } from "./trip";
 
-const companionLabels: Record<CompanionCode, Companion> = {
+export const companionLabels: Record<CompanionCode, Companion> = {
   ALONE: "혼자",
   FRIEND: "친구",
   COUPLE: "연인",

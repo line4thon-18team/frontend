@@ -19,10 +19,12 @@ import type {
 } from "../api/types";
 import { readPlanOrigin, resumeTripPath, tripCommunityPath, tripPlanBackPath, tripSettingsPath } from "../utils/navigation";
 import { apiTripToDraft, apiTripToSummary } from "../utils/serverTrip";
-import { dateLabel } from "../utils/trip";
+import { dateLabel, durationLabel, timeLabel } from "../utils/trip";
 import DirectTripBuilder from "../components/direct-trip/DirectTripBuilder";
 import ItineraryIssues from "../components/course-completion/ItineraryIssues";
 import CourseRouteMap from "../components/course-completion/CourseRouteMap";
+import TripTimeline from "../components/course-completion/TripTimeline";
+import TripSummary from "../components/course-completion/TripSummary";
 import TripSheet from "../components/common/TripSheet";
 import backIcon from "../assets/icons/nav-back.svg";
 import settingsIcon from "../assets/course-completion/settings.svg";
@@ -33,10 +35,6 @@ interface TripPlanData {
   itinerary: ItineraryVersionView | null;
   places: SavedPlaceResponse[];
   history: ItineraryVersionSummary[];
-}
-
-function timeLabel(value: string) {
-  return (value.split("T")[1] ?? value).slice(0, 5);
 }
 
 const sourceLabels: Record<ItineraryVersionSummary["source"], string> = {
@@ -234,11 +232,7 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
             <section className="course-section">
               <div className="server-course-summary">
                 <p>AI 요약 문장 없음</p>
-                <ul aria-label="여행 요약">
-                  <li><strong>{summary.durationLabel}</strong><small>여행 기간</small></li>
-                  <li><strong>{placeCount}곳</strong><small>일정에 담긴 장소</small></li>
-                  <li><strong>{apiTripToDraft(data.trip).companion} {data.trip.companionCount}명</strong><small>동행</small></li>
-                </ul>
+                <TripSummary duration={summary.durationLabel ?? durationLabel(data.trip.startDate, data.trip.endDate)} placeCount={placeCount} companion={`${apiTripToDraft(data.trip).companion} ${data.trip.companionCount}명`} />
               </div>
               <Link to={tripCommunityPath(origin, "osaka", tripId)}>공동 계획 데모 열기</Link>
               {data.itinerary ? (
@@ -297,24 +291,16 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
                       <CourseRouteMap places={mapPlaces} city={summary.city} day={activeDay + 1} schematic expanded />
                     </TripSheet>
                   )}
-                  {day?.visits.length ? (
-                    <ol className="server-course-timeline" aria-label={`${activeDay + 1}일차 장소 타임라인`}>
-                      {day.visits.map((visit) => {
-                        const place = placesById.get(visit.placeId);
-                        return (
-                          <li key={visit.itemId}>
-                            <strong>{place?.name ?? "장소 정보 없음"}</strong>
-                            {place?.address && <small>{place.address}</small>}
-                            <p>
-                              {timeLabel(visit.start)} – {timeLabel(visit.end)}
-                              {" · 이동 "}{visit.travel.minutes}분
-                              {["ESTIMATED", "ROUTE_NOT_FOUND"].includes(visit.travel.source) && " (추정)"}
-                            </p>
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  ) : <p>이날 일정에 담긴 장소가 없어요.</p>}
+                  <TripTimeline day={activeDay + 1} visits={(day?.visits ?? []).map((visit) => {
+                    const place = placesById.get(visit.placeId);
+                    const estimated = ["ESTIMATED", "ROUTE_NOT_FOUND"].includes(visit.travel.source);
+                    return {
+                      id: visit.itemId,
+                      name: place?.name,
+                      address: place?.address,
+                      timing: `${timeLabel(visit.start)} – ${timeLabel(visit.end)} · 이동 ${visit.travel.minutes}분${estimated ? " (추정)" : ""}`,
+                    };
+                  })} />
                   <section aria-labelledby="ai-edit-title">
                     <h2 id="ai-edit-title">AI로 일정 수정하기</h2>
                     <textarea

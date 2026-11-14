@@ -6,6 +6,7 @@ export const routes = {
   onboardingPreferences: "/onboarding/preferences",
   onboardingComplete: "/onboarding/complete",
   invite: "/invite/:inviteId",
+  sharedTrip: "/share/:token",
   home: "/",
   notifications: "/notifications",
   myTrips: "/my-trips",

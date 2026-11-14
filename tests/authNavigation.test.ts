@@ -10,6 +10,8 @@ test("로그인과 콜백, 초대, 약관 상세는 세션 없이 열 수 있다
   assert.equal(isPublicRoute("/login"), true);
   assert.equal(isPublicRoute("/auth/callback/google"), true);
   assert.equal(isPublicRoute("/invite/sample-token"), true);
+  assert.equal(authRedirectPath("/share/sample-token"), null);
+  assert.equal(authRedirectPath("/share/sample-token/edit"), "/login");
   assert.equal(isPublicRoute("/my/account/policies/privacy"), true);
   assert.equal(isPublicRoute("/terms/privacy"), true);
   assert.equal(authRedirectPath("/terms/privacy"), null);
