@@ -11,7 +11,7 @@ import ItineraryIssues from "../course-completion/ItineraryIssues";
 import { isServerTripId, savedPlaceToTripPlace, tripDraftToApiInput } from "../../api/adapters";
 import { isApiEnabled } from "../../api/config";
 import { hasAuthSession } from "../../api/tokenStorage";
-import { createTrip, updateTrip } from "../../api/trips";
+import { confirmTrip, createTrip, updateTrip } from "../../api/trips";
 import { saveItinerary } from "../../api/itineraries";
 import type { ItineraryDayInput, ItineraryVersionView, ItineraryVisitInput, SavedPlaceResponse } from "../../api/types";
 import { useItineraryCheck } from "../../hooks/useItineraryCheck";
@@ -339,7 +339,11 @@ function DirectTripBuilder({ existing }: { existing?: ExistingTrip } = {}) {
           existing.onSaved(itinerary);
           existing.onClose();
         } else {
-          navigate(serverTripPlanPath("generated", draft.tripId), { replace: true });
+          const confirmation = await confirmTrip(Number(draft.tripId)).catch(() => null);
+          navigate(serverTripPlanPath("generated", draft.tripId), {
+            replace: true,
+            state: { confirmation },
+          });
         }
       } catch (reason) {
         setNotice(reason instanceof Error ? reason.message : "일정을 저장하지 못했어요.");
