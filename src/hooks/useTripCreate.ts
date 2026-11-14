@@ -18,7 +18,7 @@ import { isServerTripId, tripDraftToApiInput } from "../api/adapters";
 import { generateItinerary } from "../api/itineraries";
 import { isApiEnabled } from "../api/config";
 import { hasAuthSession } from "../api/tokenStorage";
-import { createTrip as createApiTrip, updateTrip as updateApiTrip } from "../api/trips";
+import { confirmTrip, createTrip as createApiTrip, updateTrip as updateApiTrip } from "../api/trips";
 import { saveFlights, saveRental, saveStays } from "../api/reservations";
 import type { ReservationResponse, TripResponse } from "../api/types";
 import { applyReservationsToDraft } from "../api/reservationAdapters";
@@ -187,6 +187,8 @@ function useTripCreate(
         if (!isServerTripId(draft.tripId)) throw new Error("여행 정보를 먼저 저장해 주세요.");
         const result = await generateItinerary(Number(draft.tripId), controller.signal);
         if (controller.signal.aborted) return;
+        const confirmation = await confirmTrip(Number(draft.tripId), controller.signal).catch(() => null);
+        if (controller.signal.aborted) return;
         completed = true;
         try {
           sessionStorage.removeItem(DRAFT_KEY);
@@ -195,7 +197,10 @@ function useTripCreate(
         }
         navigate(serverTripPlanPath("generated", draft.tripId), {
           replace: true,
-          state: { excludedPlaceIds: result.excludedPlaceIds },
+          state: {
+            excludedPlaceIds: result.excludedPlaceIds,
+            confirmation,
+          },
         });
         return;
       }

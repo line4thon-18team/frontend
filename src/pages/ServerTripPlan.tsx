@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { ApiError } from "../api/client";
 import {
@@ -9,7 +9,7 @@ import {
   revertItinerary,
 } from "../api/itineraries";
 import { getSavedPlaces } from "../api/places";
-import { getTrip } from "../api/trips";
+import { confirmTrip, getTrip } from "../api/trips";
 import type {
   ItineraryEditPreview,
   ItineraryVersionSummary,
@@ -26,6 +26,7 @@ import CourseRouteMap from "../components/course-completion/CourseRouteMap";
 import TripSheet from "../components/common/TripSheet";
 import backIcon from "../assets/icons/nav-back.svg";
 import settingsIcon from "../assets/course-completion/settings.svg";
+import { routes } from "../config/routes";
 
 interface TripPlanData {
   trip: TripResponse;
@@ -59,6 +60,11 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
   const [actionError, setActionError] = useState("");
   const [notice, setNotice] = useState("");
   const [inviteAccepted, setInviteAccepted] = useState(state?.inviteAccepted === true);
+  const [confirmation, setConfirmation] = useState<Awaited<ReturnType<typeof confirmTrip>> | null | undefined>(
+    state?.confirmation,
+  );
+  const [confirming, setConfirming] = useState(false);
+  const confirmationPending = useRef(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -92,6 +98,7 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
   const days = data?.itinerary?.validation.days ?? [];
   const day = days[activeDay];
   const origin = readPlanOrigin(search);
+  const backPath = origin === "generated" ? routes.myTrips : tripPlanBackPath(search);
   const placesById = new Map(data?.places.map((place) => [place.placeId, place]));
   const placeCount = new Set(days.flatMap((item) => item.visits.map((visit) => visit.placeId))).size;
   const mapPlaces = (day?.visits ?? []).flatMap((visit, index) => {
@@ -101,6 +108,20 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
     return [{ id: visit.itemId, name: place.name, latitude: place.latitude, longitude: place.longitude, order: index + 1 }];
   });
   const excludedPlaceIds: string[] = Array.isArray(state?.excludedPlaceIds) ? state.excludedPlaceIds : [];
+
+  async function retryConfirmation() {
+    if (!data?.itinerary || confirmationPending.current) return;
+    confirmationPending.current = true;
+    setConfirming(true);
+    try {
+      setConfirmation(await confirmTrip(tripId));
+    } catch {
+      setConfirmation(null);
+    } finally {
+      confirmationPending.current = false;
+      setConfirming(false);
+    }
+  }
 
   const reloadHistory = async () => {
     const history = await getItineraryHistory(tripId);
@@ -182,7 +203,7 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
         {data && summary && (
           <header className="course-hero server-course-hero">
             <nav className="course-navigation" aria-label="코스 화면 탐색">
-              <Link to={tripPlanBackPath(search)} aria-label="뒤로 가기"><img src={backIcon} alt="" /></Link>
+              <Link to={backPath} aria-label="뒤로 가기"><img src={backIcon} alt="" /></Link>
               <strong>내 여행 코스</strong>
               <Link to={tripSettingsPath(origin, undefined, tripId)} aria-label="코스 설정">
                 <img src={settingsIcon} alt="" />
@@ -197,7 +218,7 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
           </header>
         )}
         <div className="course-content">
-          {!data && <Link to={tripPlanBackPath(search)}>여행 목록으로 돌아가기</Link>}
+          {!data && <Link to={backPath}>여행 목록으로 돌아가기</Link>}
           {error && <p role="alert">{error}</p>}
           {actionError && <p role="alert">{actionError}</p>}
           {notice && <p role="status">{notice}</p>}
@@ -222,6 +243,22 @@ function ServerTripPlan({ tripId }: { tripId: number }) {
               <Link to={tripCommunityPath(origin, "osaka", tripId)}>공동 계획 데모 열기</Link>
               {data.itinerary ? (
                 <>
+                  {confirmation === null && (
+                    <div>
+                      <p role={confirming ? "status" : "alert"}>
+                        {confirming ? "일정을 확정하고 있어요." : "일정은 저장됐지만 확정을 완료하지 못했어요."}
+                      </p>
+                      <button type="button" className="course-inline-edit" disabled={confirming} onClick={() => void retryConfirmation()}>
+                        확정 다시 시도
+                      </button>
+                    </div>
+                  )}
+                  {confirmation && (
+                    <p role="status">
+                      코스가 완성돼서 내 여행에 저장됐어요.
+                      {confirmation.placesNeedingCheck > 0 && ` 확인이 필요한 장소가 ${confirmation.placesNeedingCheck}곳 있어요.`}
+                    </p>
+                  )}
                   <h2>일정</h2>
                   <button type="button" className="course-inline-edit" onClick={() => setEditing(true)}>일정 직접 편집하기</button>
                   {excludedPlaceIds.length > 0 && (

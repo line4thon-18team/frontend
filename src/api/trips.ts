@@ -26,6 +26,15 @@ export function deleteTrip(tripId: number) {
   return apiRequest<void>(`/api/trips/${tripId}`, { method: "DELETE" });
 }
 
+export function confirmTrip(tripId: number, signal?: AbortSignal) {
+  return apiRequest<{
+    tripId: number;
+    status: "CONFIRMED";
+    version: number;
+    placesNeedingCheck: number;
+  }>(`/api/trips/${tripId}/confirm`, { method: "POST", signal });
+}
+
 export function createTrip(input: TripInput, signal?: AbortSignal) {
   return apiRequest<TripResponse>("/api/trips", {
     method: "POST",
