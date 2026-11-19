@@ -216,7 +216,7 @@ export const LinkForm = styled.form`
 `;
 
 export const LinkField = styled.div`
-  display: grid; gap: 8px;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px;
   label { color: #5c5c63; font-size: 13px; font-weight: 500; line-height: 18px; }
 `;
 
