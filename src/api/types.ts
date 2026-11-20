@@ -349,6 +349,7 @@ export interface CourseDetailResponse extends CourseSummaryResponse {
       longitude: number;
       visitTime: string | null;
       imageUrl: string | null;
+      travel?: Pick<TravelLeg, "mode" | "minutes" | "distanceMeters" | "estimated"> | null;
     }>;
   }>;
 }

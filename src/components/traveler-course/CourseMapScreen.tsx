@@ -18,6 +18,7 @@ export interface CourseMapStop extends RouteMapPlace {
   travelTime?: string;
   distance?: string;
   distanceMeters?: number;
+  estimatedDistance?: boolean;
 }
 
 interface CourseMapScreenProps {
@@ -42,12 +43,14 @@ export default function CourseMapScreen({ title, city, days, tripId, photoCourse
     label: day.label,
     rows: day.places.map((place, index) => {
       const next = day.places[index + 1];
-      const straightDistance = photoCourseId && next ? straightLineMeters(place, next) : undefined;
+      const straightDistance = photoCourseId && next && place.distanceMeters === undefined
+        ? straightLineMeters(place, next) : undefined;
       return {
         key: `${dayIndex}-${index}`,
         order: ++order,
         place,
         meters: place.distanceMeters ?? straightDistance,
+        straightDistance,
         distance: place.distance ?? (straightDistance === undefined ? undefined : `직선거리 ${distanceLabel(straightDistance)}`),
       };
     }),
@@ -64,10 +67,13 @@ export default function CourseMapScreen({ title, city, days, tripId, photoCourse
     ...place, id: key, order, group: label,
   })));
   const legs = groups.flatMap(({ rows }) => rows.slice(0, -1));
-  const total = legs.length && legs.every(({ meters }) => meters !== undefined)
+  const allStraight = legs.every(({ straightDistance }) => straightDistance !== undefined);
+  const allRoute = legs.every(({ straightDistance }) => straightDistance === undefined);
+  const total = legs.length && (allStraight || allRoute) && legs.every(({ meters }) => meters !== undefined)
     ? legs.reduce((sum, { meters }) => sum + (meters ?? 0), 0) : undefined;
+  const estimatedTotal = legs.some(({ place }) => place.estimatedDistance);
   const dayDistance = sampleMap && activeDay === 0 ? "도보 2.4km" : total !== undefined
-    ? `${photoCourseId ? "직선거리" : "이동 거리"} ${distanceLabel(total)}` : undefined;
+    ? `${allStraight ? "직선거리" : "이동 거리"} ${estimatedTotal ? "약 " : ""}${distanceLabel(total)}` : undefined;
 
   function chooseDay(day?: number) {
     setSelectedId(undefined);
@@ -133,7 +139,7 @@ export default function CourseMapScreen({ title, city, days, tripId, photoCourse
         <div>
           {thumbnail(selected.place)}
           <span className="map-selection-info"><strong><b>{selected.order}</b> {selected.place.name}</strong><small>{selectedSample?.detail ?? selected.place.category}</small>
-            {selected.place.travelTime && <small className="map-selection-travel">다음 장소까지 {selected.place.travelTime}</small>}</span>
+            {selected.place.travelTime && <small className="map-selection-travel">다음 장소까지 {selected.place.travelTime}{selected.distance && ` · ${selected.distance}`}</small>}</span>
         </div>
         <button type="button" onClick={() => onOpenPlace(selected.place, selected.key)}>장소 상세</button>
       </S.MapSelection> : !listHidden && <S.DaySheet aria-label="지도 아래 코스 목록" data-public-course={!tripId || undefined}>
