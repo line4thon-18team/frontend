@@ -12,6 +12,14 @@ export function getMySavedPlaces(signal?: AbortSignal) {
   return apiRequest<MySavedPlaceResponse[]>("/api/users/me/places", { signal });
 }
 
+export function askPlace(placeId: string, question: string, signal?: AbortSignal) {
+  return apiRequest<{ answer: string }>(`/api/places/${encodeURIComponent(placeId)}/ask`, {
+    method: "POST",
+    json: { question },
+    signal,
+  });
+}
+
 export function searchPlaces(
   tripId: number,
   query: string,

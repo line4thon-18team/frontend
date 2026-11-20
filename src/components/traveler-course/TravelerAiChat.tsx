@@ -1,4 +1,5 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState, type FormEvent } from "react";
+import { askPlace } from "../../api/places";
 import backIcon from "../../assets/figma/traveler-back.svg";
 import aiAvatar from "../../assets/course-community/ai-avatar.png";
 import sendIcon from "../../assets/course-community/send.svg";
@@ -13,6 +14,7 @@ interface TravelerAiChatProps {
 }
 
 const suggestions = ["근처 찻집 추천해 줘", "계단이 많은 편인가요?", "사진 찍기 좋은 시간은?"];
+const MAX_QUESTION_LENGTH = 200;
 const admissionAnswer = "아니요, 산넨자카는 누구나 자유롭게 걸을 수 있는 거리라 입장료가 없어요.\n\n골목의 상점과 찻집은 대부분 09:00 ~ 18:00에 열어요. 골목 끝의 기요미즈데라는 입장료가 따로 있으니 함께 방문한다면 참고하세요.\n\n돌계단이 많아서 편한 신발을 추천해요.";
 
 function sampleExcerpt(question: string) {
@@ -28,12 +30,47 @@ function TravelerAiChat({ place, live = false, onBack }: TravelerAiChatProps) {
   const image = place?.image;
   const [message, setMessage] = useState("");
   const [questions, setQuestions] = useState<{ question: string; excerpt?: string }[]>([]);
+  const [pendingQuestion, setPendingQuestion] = useState("");
+  const [error, setError] = useState("");
+  const request = useRef<AbortController | null>(null);
   const end = useRef<HTMLDivElement>(null);
   const sample = !live && place?.id === sannenzakaDetail.id;
+  const placeId = live ? place?.id : undefined;
+  const enabled = sample || Boolean(placeId);
 
   useEffect(() => {
-    if (questions.length) end.current?.scrollIntoView({ block: "nearest" });
-  }, [questions.length]);
+    end.current?.scrollIntoView({ block: "nearest" });
+  }, [questions.length, pendingQuestion, error]);
+
+  useEffect(() => () => request.current?.abort(), []);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const question = message.trim();
+    if (!enabled || !question || question.length > MAX_QUESTION_LENGTH || request.current) return;
+    setError("");
+    if (sample) {
+      setQuestions(current => [...current, { question, excerpt: sampleExcerpt(question) }]);
+      setMessage("");
+      return;
+    }
+    if (!placeId) return;
+
+    const controller = new AbortController();
+    request.current = controller;
+    setPendingQuestion(question);
+    try {
+      const { answer } = await askPlace(placeId, question, controller.signal);
+      if (controller.signal.aborted) return;
+      setQuestions(current => [...current, { question, excerpt: answer }]);
+      setMessage("");
+    } catch {
+      if (!controller.signal.aborted) setError("답변을 불러오지 못했어요. 다시 보내 주세요.");
+    } finally {
+      request.current = null;
+      if (!controller.signal.aborted) setPendingQuestion("");
+    }
+  }
 
   return (
     <S.AiScreen>
@@ -46,7 +83,7 @@ function TravelerAiChat({ place, live = false, onBack }: TravelerAiChatProps) {
       <S.AiMessages>
         <S.AiMessage>
           <img src={aiAvatar} alt="" />
-          <div><small>도틀로 AI</small><p>{!sample ? "공개 코스의 장소 AI 답변은 아직 이용할 수 없어요." : <>
+          <div><small>도틀로 AI</small><p>{placeId ? `${name}에 대해 궁금한 걸 물어보세요. 장소 정보를 바탕으로 답변할게요.` : !sample ? "이 장소의 AI 답변을 이용할 수 없어요." : <>
             {name}에 대해 궁금한 걸 물어보세요.<br />영업시간, 근처 맛집, 동선까지 알려드릴게요.
           </>}</p></div>
         </S.AiMessage>
@@ -67,26 +104,28 @@ function TravelerAiChat({ place, live = false, onBack }: TravelerAiChatProps) {
             <img src={aiAvatar} alt="" />
             <div><small>도틀로 AI</small>
               <p>{excerpt ?? "장소 소개와 리뷰에서 이 질문에 대한 정보를 찾지 못했어요."}</p>
-              {excerpt && <button type="button" onClick={onBack}>참고한 정보 보기</button>}
+              {sample && excerpt && <button type="button" onClick={onBack}>참고한 정보 보기</button>}
             </div>
           </S.AiMessage>
         </Fragment>)}
-        {questions.length > 0 && <div ref={end} />}
+        {pendingQuestion && <>
+          <S.UserMessage>{pendingQuestion}</S.UserMessage>
+          <S.AiMessage>
+            <img src={aiAvatar} alt="" />
+            <div><small>도틀로 AI</small><p role="status">답변을 작성하고 있어요.</p></div>
+          </S.AiMessage>
+        </>}
+        {error && <S.AiMessage><div><p role="alert">{error}</p></div></S.AiMessage>}
+        {(questions.length > 0 || pendingQuestion || error) && <div ref={end} />}
       </S.AiMessages>
 
       <S.AiComposer>
         {sample && <S.AiSuggestions>
           {suggestions.map((suggestion) => <button type="button" key={suggestion} onClick={() => setMessage(suggestion)}>{suggestion}</button>)}
         </S.AiSuggestions>}
-        <form onSubmit={(event) => {
-          event.preventDefault();
-          const question = message.trim();
-          if (!sample || !question) return;
-          setQuestions(current => [...current, { question, excerpt: sampleExcerpt(question) }]);
-          setMessage("");
-        }}>
-          <input aria-label={`${name} 질문`} disabled={!sample} value={message} onChange={(event) => setMessage(event.target.value)} placeholder={`${name.replace(" 골목", "")}에 대해 물어보세요`} />
-          <button type="submit" aria-label="질문 보내기" disabled={!sample || !message.trim()}><img src={sendIcon} alt="" /></button>
+        <form onSubmit={submit}>
+          <input aria-label={`${name} 질문`} disabled={!enabled || Boolean(pendingQuestion)} maxLength={MAX_QUESTION_LENGTH} value={message} onChange={(event) => setMessage(event.target.value)} placeholder={`${name.replace(" 골목", "")}에 대해 물어보세요`} />
+          <button type="submit" aria-label="질문 보내기" disabled={!enabled || Boolean(pendingQuestion) || !message.trim()}><img src={sendIcon} alt="" /></button>
         </form>
       </S.AiComposer>
     </S.AiScreen>

@@ -112,7 +112,7 @@ function TravelerCoursePage() {
   const [dateSheetOpen, setDateSheetOpen] = useState(() =>
     !isGuest && Boolean(liveCourseId) && new URLSearchParams(location.search).get("import") === "1",
   );
-  const [loginAction, setLoginAction] = useState<"import" | "save">();
+  const [loginAction, setLoginAction] = useState<"import" | "save" | "ask">();
   const [importStartDate, setImportStartDate] = useState("");
   const [importPending, setImportPending] = useState(false);
   const [importError, setImportError] = useState("");
@@ -264,7 +264,15 @@ function TravelerCoursePage() {
   }
 
   if (screen === "place") {
-    return <TravelerPlaceDetail key={selectedPlaceId} place={selectedPlace} city={course.city} photoCourseId={liveCourseId ?? undefined} onBack={() => setScreen(placeOrigin)} onAskAi={() => setScreen("ai")} />;
+    return <>
+      <TravelerPlaceDetail key={selectedPlaceId} place={selectedPlace} city={course.city} photoCourseId={liveCourseId ?? undefined} onBack={() => setScreen(placeOrigin)} onAskAi={() => {
+        if (liveCourseId && isGuest) setLoginAction("ask");
+        else setScreen("ai");
+      }} />
+      {isGuest && liveCourseId && loginAction === "ask" && (
+        <CourseLoginSheet courseId={liveCourseId} importCourse={false} askPlace onClose={() => setLoginAction(undefined)} />
+      )}
+    </>;
   }
 
   if (screen === "ai") {
@@ -380,7 +388,7 @@ function TravelerCoursePage() {
       </S.Toast>}
       {saveError && <S.Toast role="alert">{saveError}</S.Toast>}
       {coursesLoadError && <S.Toast role="alert">{coursesLoadError}</S.Toast>}
-      {isGuest && liveCourseId && loginAction && (
+      {isGuest && liveCourseId && loginAction && loginAction !== "ask" && (
         <CourseLoginSheet courseId={liveCourseId} importCourse={loginAction === "import"} onClose={() => setLoginAction(undefined)} />
       )}
       {dateSheetOpen && <ImportedSheet.Overlay role="presentation" onMouseDown={() => { if (!importPending) setDateSheetOpen(false); }}>
