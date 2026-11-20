@@ -36,6 +36,7 @@ import closeIcon from "../assets/icons/action-close.svg";
 import { courseImportEndDate, courseImportUncertain } from "../utils/courseImport";
 import { ApiError } from "../api/client";
 import { courseTitle, firstCoursePlaceId } from "../api/adapters";
+import { distanceLabel, travelModeLabels } from "../utils/trip";
 
 const categoryLabels: Record<PlaceCategoryCode, string> = {
   FOOD: "맛집",
@@ -71,15 +72,23 @@ function courseView(course: CourseDetailResponse): TravelerCourseView {
     mapFull: travelerCourse.mapFull,
     days: course.days.map((day) => ({
       label: `${day.dayNumber}일차`,
-      places: day.stops.map(stop => ({
-        id: stop.placeId,
-        name: stop.name,
-        category: categoryLabels[stop.category],
-        image: stop.imageUrl || hero || cityImage || "",
-        latitude: stop.latitude,
-        longitude: stop.longitude,
-        visitTime: stop.visitTime ?? undefined,
-      })),
+      places: day.stops.map((stop, index) => {
+        // The API attaches each leg to its destination. The UI shows it below its origin.
+        const travel = day.stops[index + 1]?.travel;
+        return {
+          id: stop.placeId,
+          name: stop.name,
+          category: categoryLabels[stop.category],
+          image: stop.imageUrl || hero || cityImage || "",
+          latitude: stop.latitude,
+          longitude: stop.longitude,
+          visitTime: stop.visitTime ?? undefined,
+          travelTime: travel ? `${travelModeLabels[travel.mode]} ${travel.estimated ? "약 " : ""}${travel.minutes}분` : undefined,
+          distance: travel ? `${travel.estimated ? "약 " : ""}${distanceLabel(travel.distanceMeters)}` : undefined,
+          distanceMeters: travel?.distanceMeters,
+          estimatedDistance: travel?.estimated,
+        };
+      }),
     })),
   };
 }

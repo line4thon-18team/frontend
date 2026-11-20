@@ -37,6 +37,8 @@ export interface TravelerCoursePlace {
   longitude?: number;
   travelTime?: string;
   distance?: string;
+  distanceMeters?: number;
+  estimatedDistance?: boolean;
 }
 
 export interface TravelerCourseDay {
