@@ -251,7 +251,7 @@ function useTripCreate(
           throw new Error("저장 장소를 다시 선택해 주세요.");
         }
         setProgress(1);
-        const finish = async (excludedPlaceIds?: string[]) => {
+        const finish = async (excludedPlaceIds?: string[], closedPlaceIds?: string[]) => {
           setProgress(3);
           clearGenerationAttempt(tripId);
           const confirmation = await confirmTrip(tripId, controller.signal).catch((reason: unknown) => {
@@ -267,7 +267,7 @@ function useTripCreate(
           }
           navigate(serverTripPlanPath("generated", tripDraft.tripId), {
             replace: true,
-            state: { excludedPlaceIds, confirmation },
+            state: { excludedPlaceIds, closedPlaceIds, confirmation },
           });
         };
 
@@ -292,7 +292,7 @@ function useTripCreate(
           setProgress(2);
           const result = await generateItinerary(tripId, controller.signal, savedPlaceIds);
           if (controller.signal.aborted) return;
-          await finish(result.excludedPlaceIds);
+          await finish(result.excludedPlaceIds, result.closedPlaceIds);
         } catch (reason) {
           if (controller.signal.aborted) return;
           if (mayHaveFinishedOnServer(reason)) {
