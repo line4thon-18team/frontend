@@ -30,13 +30,15 @@ const Sheet = styled(TripSheet)`
   }
 `;
 
-export default function CourseLoginSheet({ courseId, importCourse, onClose }: {
+export default function CourseLoginSheet({ courseId, importCourse, askPlace = false, onClose }: {
   courseId: number;
   importCourse: boolean;
+  askPlace?: boolean;
   onClose: () => void;
 }) {
   const [error, setError] = useState("");
-  const actionText = importCourse ? "내 일정으로 가져오세요" : "찜 목록에 담아보세요";
+  const subject = askPlace ? "이 장소에 대해" : "이 코스를";
+  const actionText = askPlace ? "AI에게 물어보세요" : importCourse ? "내 일정으로 가져오세요" : "찜 목록에 담아보세요";
 
   const login = () => {
     if (!canStartGoogleLogin()) {
@@ -53,9 +55,9 @@ export default function CourseLoginSheet({ courseId, importCourse, onClose }: {
   };
 
   return (
-    <Sheet title={`로그인하고 이 코스를 ${actionText}`} hideHeader contentGap={0} onClose={onClose}>
+    <Sheet title={`로그인하고 ${subject} ${actionText}`} hideHeader contentGap={0} onClose={onClose}>
       <img className="course-login-character" src={character} alt="" />
-      <h2>로그인하고 이 코스를<br />{actionText}</h2>
+      <h2>로그인하고 {subject}<br />{actionText}</h2>
       <ProviderButton type="button" onClick={login}>
         <img src={googleIcon} alt="" />
         Google로 시작하기
