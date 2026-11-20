@@ -323,6 +323,7 @@ function ServerTripPlan({ tripId, userId }: { tripId: number; userId: number }) 
   }));
   const mapPlaces = courseMapDays[mapOpen ? activeDay : 0]?.places.filter(isMapCoordinate) ?? [];
   const excludedPlaceIds: string[] = Array.isArray(state?.excludedPlaceIds) ? state.excludedPlaceIds : [];
+  const closedPlaceIds: string[] = Array.isArray(state?.closedPlaceIds) ? state.closedPlaceIds : [];
   const movementModes = new Set(days.flatMap((item) => item.visits
     .filter((visit) => visit.travel.distanceMeters > 0 || visit.travel.minutes > 0)
     .map((visit) => visit.travel.mode)));
@@ -690,6 +691,16 @@ function ServerTripPlan({ tripId, userId }: { tripId: number; userId: number }) 
                       <p role="status">{excludedPlaceIds.length}곳은 일정에 넣지 못했어요.</p>
                       <ul>
                         {data.places.filter((place) => place.placeId && excludedPlaceIds.includes(place.placeId)).map((place) => (
+                          <li key={place.id}>{place.name}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                  {closedPlaceIds.length > 0 && (
+                    <section aria-label="영업하지 않아 제외된 장소">
+                      <p role="status">{closedPlaceIds.length}곳은 여행 기간에 영업하지 않아 제외했어요.</p>
+                      <ul>
+                        {data.places.filter((place) => place.placeId && closedPlaceIds.includes(place.placeId)).map((place) => (
                           <li key={place.id}>{place.name}</li>
                         ))}
                       </ul>

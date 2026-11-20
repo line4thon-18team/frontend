@@ -242,6 +242,7 @@ export interface ItineraryVersionView {
 export interface GeneratedItineraryResponse {
   itinerary: ItineraryVersionView;
   excludedPlaceIds: string[];
+  closedPlaceIds?: string[];
 }
 
 export interface ItineraryDiff {
